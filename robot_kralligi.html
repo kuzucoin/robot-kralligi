@@ -2,1188 +2,835 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⚔️ Robot Krallığı</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:#0a0a1a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#eee;overflow-x:hidden;}
-#app{max-width:500px;margin:0 auto;padding:14px 14px 60px;}
-
-/* BUTONLAR */
-.btn{width:100%;display:block;padding:12px 16px;border:1px solid #444;border-radius:12px;background:#1a1a2e;color:#eee;cursor:pointer;font-size:14px;font-weight:600;text-align:center;outline:none;-webkit-appearance:none;transition:transform 0.1s,opacity 0.1s;}
-.btn:active{transform:scale(0.96);opacity:0.8;}
-.btn:disabled{opacity:0.35;transform:none;}
-.btn-p{background:#2a52cc;color:#fff;border-color:#2a52cc;}
-.btn-r{background:#c0392b;color:#fff;border-color:#c0392b;}
-.btn-g{background:#e67e22;color:#fff;border-color:#e67e22;}
-.btn-v{background:#8e44ad;color:#fff;border-color:#8e44ad;}
-.btn-t{background:#16a085;color:#fff;border-color:#16a085;}
-.btn-d{background:#2c3e50;color:#fff;border-color:#2c3e50;}
-.btn-b{background:#1a5276;color:#fff;border-color:#1a5276;}
-.btn-sm{width:auto;display:inline-block;padding:7px 13px;font-size:12px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;}
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
-
-/* KARTLAR */
-.card{background:#12122a;border:1px solid #2a2a4a;border-radius:14px;padding:14px;margin-bottom:10px;}
-h2{font-size:16px;font-weight:700;color:#fff;margin-bottom:10px;}
-.row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.lbl{font-size:11px;color:#aaa;margin-bottom:3px;}
-
-/* PROGRESS BAR */
-.pbar{background:#1a1a2e;border-radius:6px;overflow:hidden;height:10px;}
-.pfill{height:10px;border-radius:6px;transition:width 0.5s;}
-.hp-bar{background:linear-gradient(90deg,#e74c3c,#27ae60);}
-.mp-bar{background:linear-gradient(90deg,#1a5276,#3498db);}
-.en-bar{background:linear-gradient(90deg,#7b241c,#e74c3c);}
-
-/* ───────────────────────────────────── SAVAŞ ARENAS ─────────────── */
-#arena{
-  position:relative;
-  width:100%;
-  height:260px;
-  background:linear-gradient(180deg,#0a0a2a 0%,#111133 60%,#1a0a0a 100%);
-  border-radius:16px;
-  overflow:hidden;
-  margin-bottom:12px;
-  border:1px solid #2a2a4a;
-}
-/* Zemin çizgisi */
-#arena::after{
-  content:'';
-  position:absolute;
-  bottom:55px;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,#2a2a5a,transparent);
-}
-/* Arka plan yıldızlar */
-#arena::before{
-  content:'★ ✦ · ★ · ✦ ★ · ✦ · ★';
-  position:absolute;top:8px;left:0;right:0;
-  text-align:center;font-size:10px;
-  color:#1a1a3a;letter-spacing:8px;
-}
-
-/* Kahraman */
-#hero-sprite{
-  position:absolute;
-  left:12%;
-  bottom:60px;
-  font-size:72px;
-  line-height:1;
-  transition:transform 0.15s;
-  filter:drop-shadow(0 0 12px #2a52cc88);
-  cursor:default;
-  user-select:none;
-}
-#hero-sprite.attack-anim{animation:hero-atk 0.4s ease;}
-@keyframes hero-atk{
-  0%{transform:translateX(0) scale(1);}
-  30%{transform:translateX(60px) scale(1.15);}
-  60%{transform:translateX(30px) scale(1.05);}
-  100%{transform:translateX(0) scale(1);}
-}
-#hero-sprite.magic-anim{animation:hero-mag 0.5s ease;}
-@keyframes hero-mag{
-  0%{transform:scale(1);}
-  25%{transform:scale(1.3) rotate(-10deg);}
-  50%{transform:scale(0.9) rotate(5deg);}
-  100%{transform:scale(1) rotate(0);}
-}
-#hero-sprite.hurt-anim{animation:hero-hurt 0.3s ease;}
-@keyframes hero-hurt{
-  0%{transform:translateX(0);}
-  25%{transform:translateX(-20px);}
-  75%{transform:translateX(10px);}
-  100%{transform:translateX(0);}
-}
-
-/* Düşman */
-#enemy-sprite{
-  position:absolute;
-  right:12%;
-  bottom:60px;
-  font-size:72px;
-  line-height:1;
-  transition:transform 0.15s;
-  filter:drop-shadow(0 0 12px #c0392b88);
-  transform:scaleX(-1);
-  cursor:default;
-  user-select:none;
-}
-#enemy-sprite.enemy-hurt{animation:enemy-hurt 0.35s ease;}
-@keyframes enemy-hurt{
-  0%{transform:scaleX(-1) translateX(0);}
-  20%{transform:scaleX(-1) translateX(30px);}
-  50%{transform:scaleX(-1) translateX(-10px);}
-  80%{transform:scaleX(-1) translateX(15px);}
-  100%{transform:scaleX(-1) translateX(0);}
-}
-#enemy-sprite.enemy-attack{animation:enemy-atk 0.4s ease;}
-@keyframes enemy-atk{
-  0%{transform:scaleX(-1) translateX(0);}
-  40%{transform:scaleX(-1) translateX(-70px) scale(1.15);}
-  70%{transform:scaleX(-1) translateX(-40px);}
-  100%{transform:scaleX(-1) translateX(0);}
-}
-#enemy-sprite.enemy-dead{animation:enemy-dead 0.5s ease forwards;}
-@keyframes enemy-dead{
-  0%{transform:scaleX(-1) scale(1);opacity:1;}
-  50%{transform:scaleX(-1) scale(1.3) rotate(20deg);opacity:0.5;}
-  100%{transform:scaleX(-1) scale(0) rotate(45deg);opacity:0;}
-}
-
-/* Ekran flash */
-#arena-flash{
-  position:absolute;inset:0;
-  border-radius:16px;
-  pointer-events:none;
-  opacity:0;
-  transition:opacity 0.1s;
-}
-
-/* Hasar sayısı */
-.dmg-num{
-  position:absolute;
-  font-size:28px;
-  font-weight:900;
-  pointer-events:none;
-  animation:dmg-float 0.9s ease forwards;
-  text-shadow:0 2px 4px #000;
-  z-index:20;
-}
-@keyframes dmg-float{
-  0%{opacity:1;transform:translateY(0) scale(1);}
-  30%{transform:translateY(-30px) scale(1.3);}
-  100%{opacity:0;transform:translateY(-70px) scale(0.8);}
-}
-
-/* Büyü efektleri */
-.magic-star{
-  position:absolute;
-  font-size:20px;
-  pointer-events:none;
-  animation:mstar 0.7s ease forwards;
-}
-@keyframes mstar{
-  0%{opacity:1;transform:scale(0) rotate(0);}
-  50%{opacity:1;transform:scale(1.5) rotate(180deg);}
-  100%{opacity:0;transform:scale(0.5) rotate(360deg);}
-}
-
-/* Bölüm bilgisi arenada */
-#arena-info{
-  position:absolute;
-  top:10px;left:0;right:0;
-  text-align:center;
-  font-size:11px;color:#4a4a7a;font-weight:600;
-  letter-spacing:1px;
-}
-
-/* İsimler arenada */
-#hero-name-arena{
-  position:absolute;
-  left:5%;bottom:15px;
-  font-size:11px;color:#7a9aff;font-weight:700;
-  text-align:center;width:30%;
-}
-#enemy-name-arena{
-  position:absolute;
-  right:5%;bottom:15px;
-  font-size:11px;color:#ff7a7a;font-weight:700;
-  text-align:center;width:30%;
-}
-
-/* HP barları arenada */
-.arena-bars{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.arena-bar-box{background:#0d0d1f;border-radius:10px;padding:8px 10px;border:1px solid #2a2a4a;}
-.arena-bar-name{font-size:11px;font-weight:700;margin-bottom:4px;}
-.arena-bar-name.hero-clr{color:#7a9aff;}
-.arena-bar-name.enemy-clr{color:#ff7a7a;}
-
-/* LOG */
-#log{background:#0a0a1f;border-radius:10px;padding:9px 11px;min-height:55px;max-height:100px;overflow-y:auto;font-size:12px;color:#888;border:1px solid #1a1a2e;margin-bottom:10px;}
-#log p{margin-bottom:3px;padding-left:4px;border-left:2px solid transparent;}
-#log p.hit{color:#ff6b6b;border-left-color:#ff6b6b;}
-#log p.heal{color:#2ecc71;border-left-color:#2ecc71;}
-#log p.magic{color:#a29bfe;border-left-color:#a29bfe;}
-#log p.miss{color:#555;border-left-color:#555;}
-#log p.system{color:#f1c40f;border-left-color:#f1c40f;}
-
-/* AKSİYON BUTONLARI */
-#action-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.act-btn{
-  padding:14px 8px;
-  border-radius:12px;
-  border:1px solid;
-  cursor:pointer;
-  font-size:13px;
-  font-weight:700;
-  text-align:center;
-  transition:transform 0.1s,box-shadow 0.1s;
-  -webkit-appearance:none;
-}
-.act-btn:active{transform:scale(0.94);}
-.act-btn:disabled{opacity:0.35;transform:none;}
-.act-atk{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-color:#e74c3c;box-shadow:0 4px 15px #e74c3c44;}
-.act-mag{background:linear-gradient(135deg,#6c3483,#9b59b6);color:#fff;border-color:#9b59b6;box-shadow:0 4px 15px #9b59b644;}
-.act-def{background:linear-gradient(135deg,#1a5276,#2980b9);color:#fff;border-color:#2980b9;box-shadow:0 4px 15px #2980b944;}
-.act-pot{background:linear-gradient(135deg,#145a32,#27ae60);color:#fff;border-color:#27ae60;box-shadow:0 4px 15px #27ae6044;}
-.act-sp{background:linear-gradient(135deg,#4a235a,#8e44ad);color:#fff;border-color:#8e44ad;box-shadow:0 4px 15px #8e44ad44;}
-
-/* P2 */
-.p2card{background:#1a0f0a;border:1px solid #e67e22;border-radius:12px;padding:10px;margin-bottom:10px;}
-
-/* STAT ROW */
-.srow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
-.sbox{background:#1a1a2e;border-radius:8px;padding:5px 9px;font-size:11px;color:#aaa;}
-.sbox b{color:#fff;font-size:12px;}
-
-/* HARITA */
-.wmap{position:relative;width:100%;height:195px;background:linear-gradient(135deg,#0d1f0d,#0d1225 40%,#250d0d 70%,#150d25 85%,#1f150d);border-radius:14px;overflow:hidden;margin-bottom:10px;border:1px solid #2a2a4a;}
-.mzone{position:absolute;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid transparent;cursor:pointer;transition:transform 0.2s;}
-.mzone:active{transform:scale(0.95);}
-.mzone.active{border-color:#f1c40f;box-shadow:0 0 14px #f1c40f99;}
-.mzone.secret{border-color:#9b59b6;animation:psec 2s infinite;}
-@keyframes psec{0%,100%{box-shadow:0 0 5px #9b59b677;}50%{box-shadow:0 0 18px #9b59b6cc;}}
-.hdot{position:absolute;width:15px;height:15px;border-radius:50%;background:#f1c40f;border:2px solid #fff;transition:left 0.8s,top 0.8s;z-index:10;box-shadow:0 0 10px #f1c40f;}
-
-/* KARAKTER SEÇİM */
-.char-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.char-card{border:2px solid #2a2a4a;border-radius:14px;padding:14px;cursor:pointer;text-align:center;background:#12122a;transition:all 0.2s;}
-.char-card:active{transform:scale(0.97);}
-.char-card.sel{border-color:#2a52cc;background:#1a1a3a;box-shadow:0 0 20px #2a52cc44;}
-
-/* KAYIT */
-.sslot{border:1px solid #2a2a4a;border-radius:10px;padding:12px;margin-bottom:7px;cursor:pointer;background:#12122a;transition:background 0.15s;}
-.sslot:active{background:#1a1a2e;}
-.sslot.empty{opacity:0.55;border-style:dashed;}
-
-/* ZONE BADGE */
-.zbadge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;}
-.z1{background:#0d2e0d;color:#27ae60;}.z2{background:#0d1e3a;color:#3498db;}.z3{background:#2e0d0d;color:#e74c3c;}.z4{background:#1a0d2e;color:#9b59b6;}.z5{background:#2e1a0d;color:#e67e22;}
-
-/* PROG */
-.prog-wrap{background:#1a1a2e;border-radius:4px;height:5px;overflow:hidden;margin:4px 0;}
-.prog-fill{height:5px;background:#2a52cc;border-radius:4px;transition:width 0.5s;}
-
-/* SHOP */
-.ntabs{display:flex;gap:5px;margin-bottom:9px;overflow-x:auto;padding-bottom:2px;}
-.ntab{padding:6px 12px;font-size:12px;white-space:nowrap;flex-shrink:0;width:auto;display:inline-block;}
-.ntab.active{background:#e67e22;color:#fff;border-color:#e67e22;}
-
-/* SKILL */
-.snode{border:1px solid #2a2a4a;border-radius:10px;padding:10px 7px;text-align:center;cursor:pointer;background:#12122a;}
-.snode.unlocked{border-color:#8e44ad;background:#1a0d2a;}
-.snode.avail{border-color:#27ae60;}
-.snode.locked{opacity:0.4;}
-
-/* QUEST */
-.qcard{border:1px solid #2a2a4a;border-radius:10px;padding:10px;margin-bottom:7px;display:flex;gap:10px;background:#12122a;}
-.qcard.done{border-color:#27ae60;background:#0d1f0d;}
-.qbar{height:5px;background:#1a1a2e;border-radius:3px;overflow:hidden;margin-top:4px;}
-.qbfill{height:5px;background:#16a085;border-radius:3px;transition:width 0.4s;}
-
-/* BESTIARY */
-.bcard{border:1px solid #2a2a4a;border-radius:10px;padding:10px;text-align:center;background:#12122a;}
-.bcard.seen{border-color:#e67e22;}
-.bcard.unseen{opacity:0.35;filter:grayscale(1);}
-
-/* STATS */
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.scard{background:#1a1a2e;border-radius:10px;padding:11px;text-align:center;border:1px solid #2a2a4a;}
-.anum{font-size:22px;font-weight:700;color:#fff;}
-.albl{font-size:11px;color:#aaa;margin-top:2px;}
-.acard{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #2a2a4a;border-radius:10px;margin-bottom:7px;background:#12122a;}
-.acard.earned{border-color:#f1c40f;background:#1a1500;}
-.acard.locked{opacity:0.4;}
-.abadge{font-size:10px;padding:2px 7px;border-radius:8px;background:#f1c40f;color:#333;font-weight:700;}
-.stabs{display:flex;gap:5px;margin-bottom:10px;}
-.stab{padding:6px 12px;font-size:12px;border-radius:8px;border:1px solid #2a2a4a;background:#12122a;color:#eee;cursor:pointer;-webkit-appearance:none;}
-.stab.active{background:#1a5276;color:#fff;border-color:#1a5276;}
-
-/* EDITOR */
-.ecard{border:1px solid #2a2a4a;border-radius:8px;padding:8px;cursor:pointer;text-align:center;font-size:22px;background:#12122a;}
-.ecard.sel{border-color:#2a52cc;background:#1a1a3a;}
-
-/* SECRET */
-.sbanner{background:linear-gradient(90deg,#4a1a5a,#1a3050);border-radius:10px;padding:10px 14px;color:#ddd;font-size:12px;margin-bottom:10px;text-align:center;border:1px solid #6c3483;}
-
-/* FX OVERLAY */
-#fx{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
-.cfetti{position:fixed;width:9px;height:9px;border-radius:50%;animation:cfall 1.6s forwards;}
-@keyframes cfall{0%{opacity:1;transform:translateY(0) rotate(0);}100%{opacity:0;transform:translateY(260px) rotate(720deg);}}
-.toast{position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid #3a3a5a;border-radius:30px;padding:8px 20px;font-size:13px;font-weight:700;color:#fff;animation:toast-in 2s ease forwards;white-space:nowrap;z-index:1000;}
-@keyframes toast-in{0%{opacity:0;top:20px;}15%{opacity:1;top:30px;}80%{opacity:1;top:30px;}100%{opacity:0;top:20px;}}
-
-/* WIN */
-#s-win .trophy{font-size:80px;text-align:center;margin:16px 0;animation:trophy-pulse 1.5s ease infinite;}
-@keyframes trophy-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.1) rotate(5deg);}}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;overflow:hidden;font-family:-apple-system,sans-serif;}
+canvas{display:block;margin:0 auto;background:#000;}
+#ui{position:fixed;top:0;left:0;width:100%;pointer-events:none;}
+#hud{display:flex;gap:12px;align-items:center;padding:10px 16px;background:linear-gradient(180deg,#000a,transparent);}
+.bar-wrap{width:140px;}
+.bar-lbl{font-size:10px;color:#aaa;font-weight:700;margin-bottom:2px;}
+.bar-bg{background:#1a1a2e;border-radius:4px;height:10px;overflow:hidden;border:1px solid #333;}
+.bar-fill{height:10px;border-radius:4px;transition:width 0.2s;}
+#hp-fill{background:linear-gradient(90deg,#c0392b,#e74c3c);}
+#mp-fill{background:linear-gradient(90deg,#1a5276,#3498db);}
+#xp-fill{background:linear-gradient(90deg,#4a235a,#8e44ad);}
+.stat{font-size:11px;color:#fff;font-weight:700;background:#1a1a2e88;padding:4px 8px;border-radius:6px;border:1px solid #333;}
+#msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.popup{background:#000c;border:1px solid #f1c40f;border-radius:12px;padding:16px 24px;color:#fff;text-align:center;animation:popIn 0.3s ease;display:none;}
+@keyframes popIn{from{transform:scale(0.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+#controls{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);font-size:11px;color:#555;text-align:center;pointer-events:none;}
+#levelup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#1a0a2a,#0a0a1a);border:2px solid #8e44ad;border-radius:16px;padding:24px;color:#fff;text-align:center;display:none;z-index:100;min-width:280px;}
+#levelup h2{color:#f1c40f;font-size:22px;margin-bottom:10px;}
+#levelup .skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
+.sk-btn{background:#1a1a2e;border:1px solid #444;border-radius:8px;padding:10px;cursor:pointer;color:#fff;font-size:12px;transition:all 0.15s;pointer-events:all;}
+.sk-btn:hover{border-color:#8e44ad;background:#2a1a3a;}
+#gameover{position:fixed;inset:0;background:#000d;display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column;}
+#gameover h1{color:#e74c3c;font-size:48px;font-weight:900;margin-bottom:16px;}
+#gameover p{color:#aaa;font-size:16px;margin-bottom:24px;}
+#gameover button{background:#2a52cc;color:#fff;border:none;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;}
+#shop-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0a0a1a;border:1px solid #2a52cc;border-radius:16px;padding:20px;width:320px;display:none;z-index:150;color:#fff;}
+#shop-panel h3{color:#e67e22;font-size:16px;margin-bottom:12px;text-align:center;}
+.shop-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #2a2a4a;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;pointer-events:all;}
+.shop-item:hover{border-color:#e67e22;background:#1a0f0a;}
+.shop-item .price{color:#e67e22;font-weight:700;font-size:13px;margin-left:auto;}
+.shop-close{width:100%;background:#333;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;margin-top:8px;font-size:13px;pointer-events:all;}
+#floating-texts{position:fixed;top:0;left:0;pointer-events:none;width:100%;height:100%;}
+.float-txt{position:absolute;font-weight:900;animation:floatUp 1s ease forwards;text-shadow:0 2px 4px #000;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-80px) scale(0.8);}}
 </style>
 </head>
 <body>
-<div id="app">
-<div id="fx"></div>
 
-<!-- ═══ BAŞLANGIÇ ═══ -->
-<div id="s-start">
-  <div class="card" style="text-align:center;padding:36px 14px;">
-    <div style="font-size:64px;margin-bottom:10px;animation:trophy-pulse 2s infinite;">⚔️</div>
-    <div style="font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;">Robot Krallığı</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:24px;">250 bölüm · Animasyonlar · Yan görevler · Çok oyunculu</div>
-    <button class="btn btn-p" onclick="showSaves()" style="margin-bottom:10px;font-size:16px;padding:16px;">Oyuna Başla →</button>
-    <button class="btn btn-d" onclick="go('s-editor')">🗺️ Harita Editörü</button>
-  </div>
-  <div class="g5">
-    <div class="card" style="text-align:center;padding:10px 4px;"><div style="font-size:22px;">💾</div><div style="font-size:9px;color:#aaa;margin-top:3px;">Kayıt</div></div>
-    <div class="card" style="text-align:center;padding:10px 4px;"><div style="font-size:22px;">🔮</div><div style="font-size:9px;color:#aaa;margin-top:3px;">Gizli</div></div>
-    <div class="card" style="text-align:center;padding:10px 4px;"><div style="font-size:22px;">👥</div><div style="font-size:9px;color:#aaa;margin-top:3px;">2P</div></div>
-    <div class="card" style="text-align:center;padding:10px 4px;"><div style="font-size:22px;">📊</div><div style="font-size:9px;color:#aaa;margin-top:3px;">İstatistik</div></div>
-    <div class="card" style="text-align:center;padding:10px 4px;"><div style="font-size:22px;">🏅</div><div style="font-size:9px;color:#aaa;margin-top:3px;">Başarım</div></div>
-  </div>
-</div>
+<canvas id="c"></canvas>
 
-<!-- ═══ KAYITLAR ═══ -->
-<div id="s-saves" style="display:none;">
-  <h2>💾 Kayıtlarım</h2>
-  <div id="saves-list"></div>
-  <button class="btn" onclick="go('s-start')" style="margin-top:4px;">← Geri</button>
-</div>
-
-<!-- ═══ KARAKTER ═══ -->
-<div id="s-char" style="display:none;">
-  <h2>Karakterini seç</h2>
-  <div class="char-grid">
-    <div class="char-card" id="cc0" onclick="pickChar(0)">
-      <div style="font-size:48px;margin-bottom:6px;">🧙</div>
-      <div style="font-weight:800;font-size:15px;color:#fff;">Büyücü</div>
-      <div style="font-size:11px;color:#aaa;margin-top:3px;">HP:80 MP:100 ATK:14</div>
-    </div>
-    <div class="char-card" id="cc1" onclick="pickChar(1)">
-      <div style="font-size:48px;margin-bottom:6px;">⚔️</div>
-      <div style="font-weight:800;font-size:15px;color:#fff;">Savaşçı</div>
-      <div style="font-size:11px;color:#aaa;margin-top:3px;">HP:120 MP:30 ATK:20</div>
-    </div>
-    <div class="char-card" id="cc2" onclick="pickChar(2)">
-      <div style="font-size:48px;margin-bottom:6px;">🏹</div>
-      <div style="font-weight:800;font-size:15px;color:#fff;">Okçu</div>
-      <div style="font-size:11px;color:#aaa;margin-top:3px;">HP:100 MP:60 ATK:16</div>
-    </div>
-    <div class="char-card" id="cc3" onclick="pickChar(3)">
-      <div style="font-size:48px;margin-bottom:6px;">🛡️</div>
-      <div style="font-weight:800;font-size:15px;color:#fff;">Şövalye</div>
-      <div style="font-size:11px;color:#aaa;margin-top:3px;">HP:140 MP:20 DEF:14</div>
-    </div>
-  </div>
-  <button class="btn" id="btn-coop" onclick="toggleCoop()" style="margin-bottom:8px;">👤 Tek Oyunculu</button>
-  <button class="btn btn-p" id="btn-go" onclick="startGame()" disabled>Oyunu Başlat →</button>
-</div>
-
-<!-- ═══ HARİTA ═══ -->
-<div id="s-map" style="display:none;">
-  <div class="row">
-    <div style="font-size:15px;font-weight:800;color:#fff;">🌍 Dünya Haritası</div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <span style="font-size:11px;color:#16a085;font-weight:700;">📋<span id="m-qc">0</span></span>
-      <span style="font-size:13px;color:#e67e22;font-weight:700;">💰<span id="m-gold">0</span></span>
-      <button class="btn btn-sm" onclick="saveGame()">💾</button>
-    </div>
-  </div>
-  <div class="wmap">
-    <div class="mzone" id="mz0" style="left:4%;top:28%;width:17%;height:42%;background:#0d2e0d88;" onclick="goZone(0)"><div style="font-size:22px;">🌲</div><div style="font-size:8px;color:#9fe;font-weight:700;">Orman</div><div style="font-size:7px;color:#f1c40f;">1-50</div></div>
-    <div class="mzone" id="mz1" style="left:23%;top:14%;width:17%;height:40%;background:#0d1a3a88;" onclick="goZone(1)"><div style="font-size:22px;">🏔️</div><div style="font-size:8px;color:#9cf;font-weight:700;">Dağlar</div><div style="font-size:7px;color:#f1c40f;">51-100</div></div>
-    <div class="mzone" id="mz2" style="left:43%;top:28%;width:17%;height:40%;background:#3a0d0d88;" onclick="goZone(2)"><div style="font-size:22px;">🌋</div><div style="font-size:8px;color:#f99;font-weight:700;">Volkan</div><div style="font-size:7px;color:#f1c40f;">101-150</div></div>
-    <div class="mzone" id="mz3" style="left:63%;top:14%;width:17%;height:40%;background:#1a0d3a88;" onclick="goZone(3)"><div style="font-size:22px;">🌑</div><div style="font-size:8px;color:#c9f;font-weight:700;">Kale</div><div style="font-size:7px;color:#f1c40f;">151-200</div></div>
-    <div class="mzone" id="mz4" style="left:82%;top:26%;width:16%;height:44%;background:#2e1a0d88;" onclick="goZone(4)"><div style="font-size:22px;">🤖</div><div style="font-size:8px;color:#fc9;font-weight:700;">İmp.</div><div style="font-size:7px;color:#f1c40f;">201-250</div></div>
-    <div class="mzone secret" id="mz-sec" style="left:43%;top:68%;width:14%;height:28%;background:#3a0d3a88;display:none;" onclick="enterSecret()"><div style="font-size:20px;">🔮</div><div style="font-size:7px;color:#c9f;font-weight:700;">Gizli</div></div>
-    <div class="hdot" id="hdot" style="left:8%;top:43%;"></div>
-  </div>
-  <div id="sec-hint" class="sbanner" style="display:none;">🔮 Gizli bölüm açıldı!</div>
-  <div class="card" style="padding:9px 12px;">
-    <div class="row" style="margin-bottom:2px;">
-      <span style="font-size:11px;color:#aaa;">İlerleme</span>
-      <span style="font-size:10px;color:#aaa;" id="m-prog">0/250</span>
-    </div>
-    <div class="prog-wrap"><div class="prog-fill" id="m-pbar" style="width:0%"></div></div>
-  </div>
-  <div class="card" style="padding:11px 13px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
-      <div id="m-emoji" style="font-size:32px;"></div>
-      <div style="flex:1;">
-        <div style="font-size:15px;font-weight:800;color:#fff;" id="m-name"></div>
-        <div style="font-size:11px;color:#aaa;">Seviye <span id="m-lv">1</span> · 🌳<span id="m-sp">0</span> puan</div>
-      </div>
-      <div id="m-p2" style="display:none;font-size:12px;color:#e67e22;font-weight:700;">👥 2P</div>
-    </div>
-    <div class="srow">
-      <div class="sbox">❤️ <b id="m-hp"></b></div>
-      <div class="sbox">💧 <b id="m-mp"></b></div>
-      <div class="sbox">⚔️ <b id="m-atk"></b></div>
-      <div class="sbox">🛡️ <b id="m-def"></b></div>
-    </div>
-    <div id="m-story" style="background:#0d0d1f;border-radius:8px;padding:7px 10px;font-size:12px;color:#e67e22;font-style:italic;margin-bottom:6px;display:none;border:1px solid #2a1a0d;"></div>
-    <div id="m-equip" style="font-size:11px;color:#666;margin-bottom:4px;"></div>
-    <div id="m-badges" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-  </div>
-  <div class="g2" style="margin-bottom:8px;">
-    <button class="btn btn-p" onclick="enterBattle(false)" style="font-size:15px;padding:14px;">⚔️ Bölüm <span id="m-ch">1</span></button>
-    <button class="btn btn-g" onclick="go('s-shop');renderShop()">🛒 Mağaza</button>
-  </div>
-  <div class="g4">
-    <button class="btn btn-v" onclick="go('s-skills')">🌳 Yetenek</button>
-    <button class="btn btn-t" onclick="go('s-quests')">📋 Görev</button>
-    <button class="btn btn-b" onclick="go('s-stats')">📊 İstat.</button>
-    <button class="btn" onclick="go('s-bestiary')">📖 Kitap</button>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════ SAVAŞ ═══════════════════════════════════════ -->
-<div id="s-battle" style="display:none;">
-
-  <!-- Bölüm başlık -->
-  <div class="row">
-    <div style="font-size:13px;color:#aaa;font-weight:600;" id="b-label">Bölüm 1</div>
-    <div id="b-zone"></div>
-  </div>
-
-  <!-- HİKAYE -->
-  <div id="b-story" style="background:#0d0d1f;border-radius:10px;padding:9px 11px;font-size:12px;color:#e67e22;font-style:italic;margin-bottom:10px;display:none;border:1px solid #2a1a0d;"></div>
-
-  <!-- ARENA - Karakterler burada görsel olarak savaşır -->
-  <div id="arena">
-    <div id="arena-info">SAVAŞ ARENAS</div>
-    <div id="hero-sprite">🧙</div>
-    <div id="enemy-sprite">👺</div>
-    <div id="arena-flash"></div>
-    <div id="hero-name-arena">Sen</div>
-    <div id="enemy-name-arena">Düşman</div>
-  </div>
-
-  <!-- HP/MP barları -->
-  <div class="arena-bars">
-    <div class="arena-bar-box">
-      <div class="arena-bar-name hero-clr" id="bar-hname">Kahraman</div>
-      <div class="lbl">❤️ HP: <span id="b-hhp">100/100</span></div>
-      <div class="pbar" style="margin-bottom:5px;"><div class="pfill hp-bar" id="bar-hhp" style="width:100%"></div></div>
-      <div class="lbl">💧 MP: <span id="b-hmp">50/50</span></div>
-      <div class="pbar"><div class="pfill mp-bar" id="bar-hmp" style="width:100%"></div></div>
-    </div>
-    <div class="arena-bar-box">
-      <div class="arena-bar-name enemy-clr" id="bar-ename">Düşman</div>
-      <div class="lbl">❤️ HP: <span id="b-ehp">100/100</span></div>
-      <div class="pbar"><div class="pfill en-bar" id="bar-ehp" style="width:100%"></div></div>
-      <div style="font-size:10px;color:#888;margin-top:5px;">⚔️ Güç: <span id="b-eatk"></span></div>
-    </div>
-  </div>
-
-  <!-- P2 paneli -->
-  <div id="p2panel" style="display:none;">
-    <div class="p2card">
-      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
-        <span id="p2emoji" style="font-size:26px;"></span>
-        <div><div style="font-size:13px;font-weight:700;color:#fff;" id="p2name"></div><div style="font-size:10px;color:#aaa;">2. Oyuncu</div></div>
-      </div>
-      <div class="lbl">❤️ <span id="p2hp"></span></div>
-      <div class="pbar" style="margin-bottom:7px;"><div class="pfill hp-bar" id="bar-p2hp" style="width:100%"></div></div>
-      <div class="g2">
-        <button class="btn act-btn act-atk" onclick="p2Act('attack')" style="font-size:12px;padding:10px;">⚔️ P2 Saldır</button>
-        <button class="btn act-btn act-pot" onclick="p2Act('heal')" style="font-size:12px;padding:10px;">💚 P2 İyileştir</button>
+<div id="ui">
+  <div id="hud">
+    <div style="font-size:20px;" id="hero-icon">🧙</div>
+    <div>
+      <div class="bar-wrap">
+        <div class="bar-lbl">❤️ HP <span id="hp-txt">100/100</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="hp-fill" style="width:100%"></div></div>
       </div>
     </div>
-  </div>
-
-  <!-- LOG -->
-  <div id="log"></div>
-
-  <!-- AKSİYON BUTONLARI - Büyük, görsel, dokunuşa uygun -->
-  <div id="action-btns">
-    <button class="act-btn act-atk" onclick="act('attack')">⚔️<br><span style="font-size:11px;">Saldır</span></button>
-    <button class="act-btn act-mag" onclick="act('magic')">✨<br><span style="font-size:11px;">Büyü (20 MP)</span></button>
-    <button class="act-btn act-sp" id="btn-sp" onclick="act('special')" style="display:none;">🌀<br><span style="font-size:11px;">Zaman Dur</span></button>
-    <button class="act-btn act-def" onclick="act('defend')">🛡️<br><span style="font-size:11px;">Savun</span></button>
-    <button class="act-btn act-pot" onclick="act('potion')">🧪<br><span id="pot-count" style="font-size:11px;">İksir (3)</span></button>
-  </div>
-
-</div>
-<!-- ═══════════════════════════════════════════════════════════════════════════════════ -->
-
-<!-- ═══ ÖDÜL ═══ -->
-<div id="s-reward" style="display:none;">
-  <div class="card" style="text-align:center;padding:24px 14px;">
-    <div style="font-size:48px;margin-bottom:8px;" id="r-emoji">🎉</div>
-    <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;" id="r-title">Zafer!</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:12px;white-space:pre-line;" id="r-desc"></div>
-    <div id="r-special" style="display:none;background:#1a1a0d;border-radius:10px;padding:10px;border:1px solid #2a2a0d;margin-bottom:12px;">
-      <div style="font-size:12px;color:#e67e22;font-weight:700;margin-bottom:3px;">🎁 Özel Ödül!</div>
-      <div id="r-spec-txt" style="font-size:13px;color:#fff;"></div>
+    <div>
+      <div class="bar-wrap">
+        <div class="bar-lbl">💧 MP <span id="mp-txt">50/50</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="mp-fill" style="width:100%"></div></div>
+      </div>
     </div>
-    <div id="r-ach" style="display:none;background:#1a1500;border-radius:10px;padding:10px;border:1px solid #f1c40f44;margin-bottom:12px;">
-      <div style="font-size:12px;color:#f1c40f;font-weight:700;margin-bottom:3px;">🏅 Yeni Başarım!</div>
-      <div id="r-ach-txt" style="font-size:13px;color:#fff;"></div>
+    <div>
+      <div class="bar-wrap">
+        <div class="bar-lbl">⭐ XP</div>
+        <div class="bar-bg"><div class="bar-fill" id="xp-fill" style="width:0%"></div></div>
+      </div>
     </div>
-    <div class="g2">
-      <button class="btn btn-g" onclick="go('s-shop');renderShop()">🛒 Mağaza</button>
-      <button class="btn btn-p" onclick="nextCh()">Devam →</button>
-    </div>
+    <div class="stat">Sv.<span id="lv-txt">1</span></div>
+    <div class="stat">💰<span id="gold-txt">0</span></div>
+    <div class="stat">📍Bölüm <span id="ch-txt">1</span>/250</div>
+    <div class="stat" style="cursor:pointer;pointer-events:all;" onclick="openShop()">🛒</div>
   </div>
 </div>
 
-<!-- ═══ BİTİŞ ═══ -->
-<div id="s-win" style="display:none;">
-  <div class="card" style="text-align:center;padding:32px 14px;">
-    <div class="trophy">🏆</div>
-    <div style="font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;">Tebrikler, Efsane!</div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:14px;">250 bölümü tamamladın!</div>
-    <div style="font-size:56px;margin:8px 0;">🤖</div>
-    <div style="font-size:13px;color:#e67e22;font-weight:700;margin-bottom:14px;">🎖️ Altın Kupa + Efsane Robot Hediyesi!</div>
-    <div id="win-badges" style="display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <button class="btn btn-p" onclick="go('s-start')" style="font-size:16px;padding:16px;">Yeniden Oyna</button>
-  </div>
+<div id="floating-texts"></div>
+
+<div id="levelup">
+  <h2>⬆️ SEVİYE ATLADI!</h2>
+  <p id="lv-msg" style="color:#aaa;font-size:13px;margin-bottom:8px;"></p>
+  <div class="skills-grid" id="skills-grid"></div>
+  <button class="sk-btn" style="width:100%;margin-top:4px;" onclick="closeLevelUp()">Devam Et →</button>
 </div>
 
-<!-- ═══ MAĞAZA ═══ -->
-<div id="s-shop" style="display:none;">
-  <div class="row">
-    <h2 style="margin:0;">🛒 Mağaza</h2>
-    <span style="font-size:15px;color:#e67e22;font-weight:800;">💰<span id="sh-gold">0</span></span>
-  </div>
-  <div class="ntabs">
-    <button class="btn ntab active" id="tab-w" onclick="showTab('w')">⚔️ Silah</button>
-    <button class="btn ntab" id="tab-a" onclick="showTab('a')">🛡️ Zırh</button>
-    <button class="btn ntab" id="tab-p" onclick="showTab('p')">🧪 İksir</button>
-    <button class="btn ntab" id="tab-c" onclick="showTab('c')">🎨 Kozmetik</button>
-  </div>
-  <div id="sh-items"></div>
-  <button class="btn" onclick="showMap()" style="margin-top:7px;">← Haritaya Dön</button>
+<div id="gameover" style="display:flex;display:none;">
+  <h1>💀 ÖLDÜN</h1>
+  <p id="go-msg">Ama bu seferi daha iyi yapacaksın!</p>
+  <button onclick="respawn()">🔄 Yeniden Başla</button>
 </div>
 
-<!-- ═══ YETENEK ═══ -->
-<div id="s-skills" style="display:none;">
-  <div class="row">
-    <h2 style="margin:0;">🌳 Yetenek Ağacı</h2>
-    <span style="font-size:15px;color:#8e44ad;font-weight:800;">🌳<span id="sk-pts">0</span></span>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;" id="sk-grid"></div>
-  <button class="btn" onclick="showMap()" style="margin-top:10px;">← Haritaya Dön</button>
+<div id="shop-panel">
+  <h3>🛒 Silah & Zırh Mağazası</h3>
+  <div id="shop-items"></div>
+  <button class="shop-close" onclick="closeShop()">✕ Kapat</button>
 </div>
 
-<!-- ═══ GÖREVLER ═══ -->
-<div id="s-quests" style="display:none;">
-  <div class="row">
-    <h2 style="margin:0;">📋 Günlük Görevler</h2>
-    <button class="btn btn-sm" onclick="refreshQ()">🔄 Yenile</button>
-  </div>
-  <div id="q-list"></div>
-  <div style="padding:10px;background:#0d0d1f;border-radius:10px;margin-top:8px;">
-    <div style="font-size:12px;font-weight:700;margin-bottom:3px;">🏆 Tamamlanan</div>
-    <div style="font-size:11px;color:#aaa;" id="q-done-cnt">0 görev</div>
-  </div>
-  <button class="btn" onclick="showMap()" style="margin-top:8px;">← Haritaya Dön</button>
-</div>
-
-<!-- ═══ ANSİKLOPEDİ ═══ -->
-<div id="s-bestiary" style="display:none;">
-  <h2>📖 Canavar Ansiklopedisi</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" id="b-grid"></div>
-  <button class="btn" onclick="showMap()" style="margin-top:10px;">← Haritaya Dön</button>
-</div>
-
-<!-- ═══ GİZLİ ═══ -->
-<div id="s-secret" style="display:none;">
-  <div class="sbanner" style="font-size:16px;padding:14px;">🔮 Gizemli Mağara</div>
-  <div class="card" style="padding:14px;">
-    <div style="font-size:16px;font-weight:800;color:#fff;margin-bottom:8px;" id="sec-title"></div>
-    <div style="font-size:13px;color:#aaa;margin-bottom:12px;" id="sec-desc"></div>
-    <div class="g2">
-      <button class="btn btn-r" onclick="enterBattle(true)">⚔️ Savaşa Gir!</button>
-      <button class="btn" onclick="showMap()">← Geri</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ İSTATİSTİK ═══ -->
-<div id="s-stats" style="display:none;">
-  <h2>📊 İstatistik & Başarımlar</h2>
-  <div class="stabs">
-    <button class="stab active" id="st-s" onclick="statsTab('s')">📊 İstatistik</button>
-    <button class="stab" id="st-a" onclick="statsTab('a')">🏅 Başarımlar</button>
-    <button class="stab" id="st-r" onclick="statsTab('r')">🏆 Rekorlar</button>
-  </div>
-  <div id="stats-body"></div>
-  <button class="btn" onclick="showMap()" style="margin-top:8px;">← Haritaya Dön</button>
-</div>
-
-<!-- ═══ EDİTÖR ═══ -->
-<div id="s-editor" style="display:none;">
-  <h2>🗺️ Harita Editörü</h2>
-  <div class="card" style="padding:14px;">
-    <div style="font-size:12px;font-weight:700;color:#ccc;margin-bottom:8px;">Düşman Seç</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;" id="ed-enemies"></div>
-    <div style="font-size:12px;font-weight:700;color:#ccc;margin-bottom:6px;">Zorluk</div>
-    <div class="g3" style="margin-bottom:12px;">
-      <button class="btn" id="ed-easy" onclick="setDiff('easy')" style="font-size:12px;">😊 Kolay</button>
-      <button class="btn btn-p" id="ed-medium" onclick="setDiff('medium')" style="font-size:12px;">😤 Orta</button>
-      <button class="btn" id="ed-hard" onclick="setDiff('hard')" style="font-size:12px;">😡 Zor</button>
-    </div>
-    <div style="font-size:12px;font-weight:700;color:#ccc;margin-bottom:6px;">Ödül</div>
-    <div class="g3" style="margin-bottom:12px;">
-      <button class="btn btn-p" id="ed-gold" onclick="setRew('gold')" style="font-size:12px;">💰 Altın</button>
-      <button class="btn" id="ed-item" onclick="setRew('item')" style="font-size:12px;">🎁 Eşya</button>
-      <button class="btn" id="ed-xp" onclick="setRew('xp')" style="font-size:12px;">⭐ XP</button>
-    </div>
-    <div id="ed-preview" style="background:#0d0d1f;border-radius:8px;padding:9px;font-size:12px;color:#ccc;margin-bottom:9px;border:1px solid #1a1a2e;"></div>
-    <button class="btn btn-p" onclick="playCustom()" style="margin-bottom:8px;">▶ Özel Bölümü Oyna!</button>
-  </div>
-  <button class="btn" onclick="go('s-start')">← Geri</button>
-</div>
-
-</div><!-- /app -->
+<div id="controls">WASD / Ok Tuşları: Hareket & Zıpla | Sol Tık: Saldır | Sağ Tık: Büyü | E: Mağaza</div>
 
 <script>
-// ── GÜVENLİ DEPOLAMA ──
-var MEM={};
-var STORE=(function(){
-  try{localStorage.setItem('_t','1');localStorage.removeItem('_t');
-    return{get:function(k){try{return localStorage.getItem(k);}catch(e){return MEM[k]||null;}},set:function(k,v){try{localStorage.setItem(k,v);}catch(e){MEM[k]=v;}}};}
-  catch(e){return{get:function(k){return MEM[k]||null;},set:function(k,v){MEM[k]=v;}};}
-}());
+var C=document.getElementById('c');
+var ctx=C.getContext('2d');
 
-// ── VERİ ──
-var CHARS=[
-  {emoji:'🧙',name:'Büyücü',hp:80,mp:100,atk:14,def:4},
-  {emoji:'⚔️',name:'Savaşçı',hp:120,mp:30,atk:20,def:6},
-  {emoji:'🏹',name:'Okçu',hp:100,mp:60,atk:16,def:5},
-  {emoji:'🛡️',name:'Şövalye',hp:140,mp:20,atk:10,def:14}
-];
-var ZONES=[
-  {name:'🌲 Orman',cls:'z1',from:1,to:50,e:[{e:'👺',n:'Goblin',l:'Sinsi ve hızlı.'},{e:'🐺',n:'Kurt',l:'Sürü halinde saldırır.'},{e:'🧟',n:'Canavar',l:'Ormanın laneti.'}]},
-  {name:'🏔️ Dağlar',cls:'z2',from:51,to:100,e:[{e:'🗿',n:'Dev',l:'Dağların efendisi.'},{e:'🦅',n:'Kartal',l:'Tepe rüzgarı.'},{e:'🐻',n:'Ayı',l:'Buz gibi soğuk.'}]},
-  {name:'🌋 Volkan',cls:'z3',from:101,to:150,e:[{e:'🐉',n:'Ejderha',l:'Lavda doğdu.'},{e:'🔥',n:'Ateş Ruhu',l:'Saf alev.'},{e:'🦎',n:'Lav Ejderi',l:'Hızlı ve yakıcı.'}]},
-  {name:'🌑 Kale',cls:'z4',from:151,to:200,e:[{e:'🧛',n:'Vampir',l:'Bin yıllık.'},{e:'💀',n:'İskelet',l:'Eski savaşçılar.'},{e:'🌑',n:'Karanlık Lord',l:'Gecenin efendisi.'}]},
-  {name:'🤖 İmp.',cls:'z5',from:201,to:250,e:[{e:'🤖',n:'Patron Robot',l:'Hata yapmaz.'},{e:'⚙️',n:'Mekanik Dev',l:'10 metre boyunda.'},{e:'🛸',n:'Uzay Robotu',l:'Başka galaksi.'}]}
-];
-var STORIES=[
-  ['Goblinler köyü bastı!','Ormanda gizemli sesler...','Ormanın kalbi tehlikede...'],
-  ['Dağ geçidi kapandı...','Zirvede gizemli ışık...','Kayıp kaşifler var...'],
-  ['Volkan uyandı!','Ejderha yumurtaları...','Tapınak mühürsüz...'],
-  ['Kale karanlığa büründü...','Gece yarısı çanlar...','Vampir ordusu ilerliyor...'],
-  ['Robot İmparatoru geliyor...','Fabrikalar durmuyor...','Son savaş başlıyor...']
-];
-var RPARTS=['🦾 Sol Kol','🦿 Sol Bacak','🤖 Gövde','🦾 Sağ Kol','🦿 Sağ Bacak'];
-var SECRETS=[
-  {title:'Karanlık Ejderha İni',desc:'Efsanevi ejderha burada!',enemy:{emoji:'🐲',name:'Efsanevi Ejderha',hp:400,maxHp:400,atk:45,def:20},gm:5},
-  {title:'Hayalet Kule',desc:'Yüzyıllık kule, hayaletlerle dolu.',enemy:{emoji:'👻',name:'Büyük Hayalet',hp:300,maxHp:300,atk:38,def:15},gm:4},
-  {title:'Robot Fabrikası',desc:'Terk edilmiş fabrika.',enemy:{emoji:'🤖',name:'Fabrika Devi',hp:500,maxHp:500,atk:55,def:30},gm:6}
-];
-var SKILLS=[
-  {id:'s1',e:'🔥',n:'Ateş Topu',d:'Büyü x2',c:1,req:null},
-  {id:'s2',e:'⚡',n:'Çift Vuruş',d:'Saldırı +50%',c:1,req:null},
-  {id:'s3',e:'💚',n:'Şifa',d:'Her tur +5HP',c:1,req:null},
-  {id:'s4',e:'🛡️',n:'Demir Deri',d:'DEF +10',c:2,req:'s1'},
-  {id:'s5',e:'⭐',n:'Kritik',d:'%25 → x3 hasar',c:2,req:'s2'},
-  {id:'s6',e:'🌀',n:'Mana Akışı',d:'MP max +50',c:2,req:'s3'},
-  {id:'s7',e:'👑',n:'Efsane Güç',d:'ATK +20',c:3,req:'s5'},
-  {id:'s8',e:'🌟',n:'Ölümsüzlük',d:'Ölümde 1HP kal',c:3,req:'s4'},
-  {id:'s9',e:'🔮',n:'Zaman Dur',d:'Düşmanı dondur',c:3,req:'s6'}
-];
-var SHOP={
-  w:[{id:'w1',e:'🗡️',n:'Demir Kılıç',s:'+5 ATK',atk:5,hp:0,def:0,p:50},{id:'w2',e:'⚔️',n:'Çelik Kılıç',s:'+12 ATK',atk:12,hp:0,def:0,p:130},{id:'w3',e:'🔱',n:'Ejderha Mızrağı',s:'+22 ATK',atk:22,hp:0,def:0,p:280},{id:'w4',e:'🌟',n:'Efsanevi Kılıç',s:'+40 ATK',atk:40,hp:0,def:0,p:600},{id:'w5',e:'⚡',n:'Şimşek Yayı',s:'+55 ATK',atk:55,hp:0,def:0,p:1000}],
-  a:[{id:'a1',e:'🧥',n:'Deri Zırh',s:'+5DEF +10HP',atk:0,def:5,hp:10,p:50},{id:'a2',e:'🛡️',n:'Zincir Zırh',s:'+12DEF +20HP',atk:0,def:12,hp:20,p:130},{id:'a3',e:'🦺',n:'Plaket Zırh',s:'+22DEF +40HP',atk:0,def:22,hp:40,p:280},{id:'a4',e:'👑',n:'Kral Zırhı',s:'+35DEF +80HP',atk:0,def:35,hp:80,p:600},{id:'a5',e:'🤖',n:'Robot Zırhı',s:'+50DEF +150HP',atk:0,def:50,hp:150,p:1000}],
-  p:[{id:'p1',e:'🧪',n:'Küçük İksir',s:'+30HP',hp:30,mp:0,p:30,pot:true},{id:'p2',e:'💧',n:'Mana İksiri',s:'+30MP',hp:0,mp:30,p:30,pot:true},{id:'p3',e:'🍶',n:'Büyük İksir',s:'+80HP',hp:80,mp:0,p:80,pot:true},{id:'p4',e:'✨',n:'Elit İksir',s:'+150HP+50MP',hp:150,mp:50,p:200,pot:true}],
-  c:[{id:'c1',e:'🌈',n:'Gökkuşağı',s:'Saldırı efekti değişir',p:150,cos:true},{id:'c2',e:'💜',n:'Mor Aura',s:'Karakter rengi mor',p:200,cos:true},{id:'c3',e:'🔥',n:'Alev Silah',s:'Silah alev efekti',p:250,cos:true},{id:'c4',e:'❄️',n:'Buz Zırh',s:'Zırh buz görünümü',p:300,cos:true}]
+// Ekran boyutu
+function resize(){C.width=Math.min(window.innerWidth,900);C.height=window.innerHeight;}
+resize();
+window.addEventListener('resize',resize);
+
+// ── OYUNCU ──
+var P={
+  x:200,y:300,w:36,h:48,
+  vx:0,vy:0,
+  onGround:false,
+  hp:100,maxHp:100,
+  mp:50,maxMp:50,
+  xp:0,xpNext:100,
+  level:1,gold:100,
+  atk:18,def:4,
+  char:0, // 0=büyücü,1=savaşçı,2=okçu,3=şövalye
+  skills:[], skillPoints:0,
+  equip:{w:null,a:null},
+  invincible:0,
+  chapter:1,
+  potions:3,
+  cosm:[],
+  badges:[],rparts:[],
+  kc:0,bc:0,ws:0,mws:0
 };
-var QT=[
-  {id:'q1',n:'Düşman Avcısı',d:'10 düşman öldür',t:'kill',g:10,r:100,rt:'gold'},
-  {id:'q2',n:'Savaş Ustası',d:'5 savaşı üst üste kazan',t:'ws',g:5,r:150,rt:'gold'},
-  {id:'q3',n:'Büyücü',d:'Büyü ile 200 hasar ver',t:'mdmg',g:200,r:1,rt:'sp'},
-  {id:'q4',n:'Hazine Avcısı',d:'500 altın kazan',t:'gold',g:500,r:2,rt:'sp'},
-  {id:'q5',n:'Kaşif',d:'10 farklı bölüm geç',t:'chs',g:10,r:200,rt:'gold'},
-  {id:'q6',n:'Patron Katili',d:'1 patron öldür',t:'boss',g:1,r:3,rt:'sp'}
+var CHARS=[
+  {emoji:'🧙',color:'#a29bfe',name:'Büyücü'},
+  {emoji:'⚔️',color:'#e17055',name:'Savaşçı'},
+  {emoji:'🏹',color:'#55efc4',name:'Okçu'},
+  {emoji:'🛡️',color:'#74b9ff',name:'Şövalye'}
 ];
-var ACH=[
-  {id:'a1',e:'🗡️',n:'İlk Kan',d:'İlk düşmanını öldür',f:function(s){return s.kc>=1;},sec:false},
-  {id:'a2',e:'💀',n:'Savaş Makinesi',d:'50 düşman öldür',f:function(s){return s.kc>=50;},sec:false},
-  {id:'a3',e:'☠️',n:'Efsane Katil',d:'250 düşman öldür',f:function(s){return s.kc>=250;},sec:false},
-  {id:'a4',e:'🏃',n:'Kaşif',d:'25. bölüme ulaş',f:function(s){return s.ch>=25;},sec:false},
-  {id:'a5',e:'🗺️',n:'Kıtayı Geç',d:'100. bölüme ulaş',f:function(s){return s.ch>=100;},sec:false},
-  {id:'a6',e:'👑',n:'Patron Katili',d:'İlk patronu öldür',f:function(s){return s.bc>=1;},sec:false},
-  {id:'a7',e:'🏆',n:'Tüm Patronlar',d:'5 patron öldür',f:function(s){return s.bc>=5;},sec:false},
-  {id:'a8',e:'💰',n:'Zengin',d:'1000 altın biriktir',f:function(s){return s.gold>=1000;},sec:false},
-  {id:'a9',e:'🌟',n:'Efsane Zengin',d:'5000 altın biriktir',f:function(s){return s.gold>=5000;},sec:false},
-  {id:'a10',e:'🔮',n:'Gizli Kaşif',d:'Gizli bölümü bul',f:function(s){return s.su;},sec:true},
-  {id:'a11',e:'✨',n:'Büyü Ustası',d:'1000 büyü hasarı ver',f:function(s){return s.md>=1000;},sec:false},
-  {id:'a12',e:'🌳',n:'Yetenek Ustası',d:'3 yetenek öğren',f:function(s){return s.ul&&s.ul.length>=3;},sec:false},
-  {id:'a13',e:'🛡️',n:'Sağ Kalan',d:'Savaşı 1 HP ile kazan',f:function(s){return s.sv>=1;},sec:true},
-  {id:'a14',e:'⚡',n:'Hız Rekoru',d:'10 savaşı üst üste kazan',f:function(s){return s.mws>=10;},sec:false},
-  {id:'a15',e:'🤖',n:'Robot Koleksiyon',d:'3 robot parçası topla',f:function(s){return s.rp&&s.rp.length>=3;},sec:false}
-];
-var ALL_E=[{e:'👺',n:'Goblin'},{e:'🐺',n:'Kurt'},{e:'🐉',n:'Ejderha'},{e:'🧛',n:'Vampir'},{e:'🤖',n:'Robot'},{e:'👑',n:'Patron'},{e:'🌑',n:'Karanlık Lord'},{e:'🛸',n:'Uzay Robotu'}];
 
-// ── DURUM ──
-var hero={},enemy={},chapter=1,selChar=-1,defending=false,potions=3;
-var badges=[],rparts=[],gold=0,shopTab='w';
-var equip={w:null,a:null};
-var ul=[],sp=0,seen={},immortUsed=false,frozen=0;
-var coop=false,coopOn=false,p2={};
-var quests=[],qprog={},qdone=0;
-var kc=0,ws=0,mws=0,md=0,ge=0,cpd=0,bc=0;
-var tdmg=0,tdmgr=0,sf=0,sv=0,tb=0,tw=0;
-var isSecret=false,curSecret=null,secretOn=false,cosm=[];
-var saveSlot=-1,earned=[];
-var stab='s';
-var edEnemy=ALL_E[0],edDiff='medium',edRew='gold';
-var SK='rpg_v4';
+// ── FİZİK ──
+var GRAVITY=0.55;
+var JUMP=-13;
+var SPEED=4.5;
+var keys={};
+window.addEventListener('keydown',function(e){keys[e.code]=true;if(e.code==='KeyE')openShop();if(e.code==='Space')e.preventDefault();});
+window.addEventListener('keyup',function(e){keys[e.code]=false;});
 
-// ── KAYIT ──
-function loadSaves(){try{var r=STORE.get(SK);return r?JSON.parse(r):[null,null,null];}catch(e){return[null,null,null];}}
-function writeSaves(s){try{STORE.set(SK,JSON.stringify(s));}catch(e){}}
-function showSaves(){
-  var sv=loadSaves();var h='';
-  for(var i=0;i<3;i++){
-    var s=sv[i];
-    if(s){h+='<div class="sslot" onclick="loadSave('+i+')">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-      +'<div><div style="font-size:14px;font-weight:700;color:#fff;">'+(CHARS[s.sc]?CHARS[s.sc].emoji:'')+' '+(s.hn||'?')+' · Sv.'+(s.lv||1)+'</div>'
-      +'<div style="font-size:11px;color:#aaa;">Bölüm '+(s.ch||1)+' · 💰'+(s.gold||0)+' · 🏅'+((s.earned||[]).length)+' başarım</div>'
-      +'</div><button class="btn btn-sm btn-r" onclick="event.stopPropagation();delSave('+i+')">🗑️</button>'
-      +'</div></div>';}
-    else h+='<div class="sslot empty" onclick="newGame('+i+')" style="text-align:center;"><div style="font-size:13px;color:#aaa;">+ Yeni Oyun (Slot '+(i+1)+')</div></div>';
+// ── DÜNYA ──
+var CAM={x:0,y:0};
+var platforms=[];
+var enemies=[];
+var particles=[];
+var projectiles=[];
+var collectibles=[];
+var chapter=1;
+var chapterTimer=0;
+var chapterEnemies=0;
+var shopOpen=false;
+var lvlUpOpen=false;
+var dead=false;
+
+// PLATFORM TİPLERİ
+function genLevel(ch){
+  platforms=[];enemies=[];collectibles=[];projectiles=[];
+  var W=C.width;var base=C.height-60;
+  // Zemin
+  platforms.push({x:-200,y:base,w:4000,h:60,color:'#1a1a2e',type:'ground'});
+  // Platformlar
+  var px=300;
+  for(var i=0;i<18;i++){
+    var pw=80+Math.random()*120;
+    var py=base-80-Math.random()*180;
+    platforms.push({x:px,y:py,w:pw,h:14,color:i%3===0?'#2a1a4a':'#1a2a4a',type:'platform'});
+    px+=pw+60+Math.random()*80;
+    // Bazı platformlarda yüzen ödül
+    if(Math.random()>0.6) collectibles.push({x:px-pw/2,y:py-30,type:Math.random()>0.5?'gold':'hp',collected:false});
   }
-  document.getElementById('saves-list').innerHTML=h;go('s-saves');
-}
-function newGame(slot){saveSlot=slot;selChar=-1;go('s-char');document.querySelectorAll('.char-card').forEach(function(c){c.classList.remove('sel');});document.getElementById('btn-go').disabled=true;}
-function loadSave(slot){
-  var saves=loadSaves();var s=saves[slot];if(!s)return;
-  saveSlot=slot;selChar=s.sc;
-  var b=CHARS[selChar];
-  hero={emoji:b.emoji,name:s.hn,hp:s.hp,maxHp:s.mhp,mp:s.mp,maxMp:s.mmp,atk:s.atk,def:s.def,level:s.lv,xp:s.xp};
-  chapter=s.ch||1;gold=s.gold||0;badges=s.badges||[];rparts=s.rp||[];potions=s.pot||3;
-  equip=s.equip||{w:null,a:null};ul=s.ul||[];sp=s.sp||0;
-  quests=s.quests||[];qprog=s.qprog||{};qdone=s.qdone||0;
-  kc=s.kc||0;ws=s.ws||0;mws=s.mws||0;md=s.md||0;ge=s.ge||0;cpd=s.cpd||0;bc=s.bc||0;
-  tdmg=s.tdmg||0;tdmgr=s.tdmgr||0;sf=s.sf||0;sv=s.sv||0;tb=s.tb||0;tw=s.tw||0;
-  secretOn=s.su||false;cosm=s.cosm||[];coop=false;earned=s.earned||[];
-  if(!quests||quests.length===0)genQ();showMap();
-}
-function saveGame(){
-  var saves=loadSaves();
-  saves[saveSlot]={sc:selChar,hn:hero.name,hp:hero.hp,mhp:hero.maxHp,mp:hero.mp,mmp:hero.maxMp,
-    atk:hero.atk,def:hero.def,lv:hero.level,xp:hero.xp,ch:chapter,gold:gold,badges:badges,rp:rparts,pot:potions,
-    equip:equip,ul:ul,sp:sp,quests:quests,qprog:qprog,qdone:qdone,
-    kc:kc,ws:ws,mws:mws,md:md,ge:ge,cpd:cpd,bc:bc,tdmg:tdmg,tdmgr:tdmgr,sf:sf,sv:sv,tb:tb,tw:tw,
-    su:secretOn,cosm:cosm,earned:earned};
-  writeSaves(saves);toast('💾 Kaydedildi!');
-}
-function delSave(slot){if(!confirm('Kayıt silinsin mi?'))return;var saves=loadSaves();saves[slot]=null;writeSaves(saves);showSaves();}
-
-// ── EKRAN ──
-var SCREENS=['s-start','s-saves','s-char','s-map','s-battle','s-reward','s-win','s-shop','s-skills','s-quests','s-bestiary','s-secret','s-editor','s-stats'];
-function go(id){
-  for(var i=0;i<SCREENS.length;i++) document.getElementById(SCREENS[i]).style.display='none';
-  document.getElementById(id).style.display='block';
-  if(id==='s-skills') renderSkills();
-  if(id==='s-bestiary') renderBestiary();
-  if(id==='s-quests') renderQ();
-  if(id==='s-editor') renderEditor();
-  if(id==='s-stats'){stab='s';renderStats();}
-  if(id==='s-shop') document.getElementById('sh-gold').textContent=gold;
-}
-
-// ── KARAKTER ──
-function pickChar(i){
-  selChar=i;
-  document.querySelectorAll('.char-card').forEach(function(c,j){c.classList.toggle('sel',j===i);});
-  document.getElementById('btn-go').disabled=false;
-}
-function toggleCoop(){coopOn=!coopOn;var btn=document.getElementById('btn-coop');btn.textContent=coopOn?'👥 İki Oyunculu Aktif':'👤 Tek Oyunculu';btn.style.background=coopOn?'#16a085':'';btn.style.color=coopOn?'#fff':'';}
-function startGame(){
-  if(selChar<0)return;
-  var b=CHARS[selChar];
-  hero={emoji:b.emoji,name:b.name,hp:b.hp,maxHp:b.hp,mp:b.mp,maxMp:b.mp,atk:b.atk,def:b.def,level:1,xp:0};
-  chapter=1;gold=100;badges=[];rparts=[];potions=3;equip={w:null,a:null};
-  ul=[];sp=0;seen={};immortUsed=false;frozen=0;
-  kc=0;ws=0;mws=0;md=0;ge=0;cpd=0;bc=0;tdmg=0;tdmgr=0;sf=0;sv=0;tb=0;tw=0;
-  secretOn=false;cosm=[];qdone=0;earned=[];
-  coop=coopOn;
-  if(coop){var others=CHARS.filter(function(_,i){return i!==selChar;});var pb=others[Math.floor(Math.random()*others.length)];p2={emoji:pb.emoji,name:pb.name,hp:pb.hp,maxHp:pb.hp,atk:pb.atk,def:pb.def};}
-  genQ();showMap();
-}
-
-// ── YARDIMCI ──
-function getZone(ch){for(var i=0;i<ZONES.length;i++){if(ch>=ZONES[i].from&&ch<=ZONES[i].to)return ZONES[i];}return ZONES[4];}
-function getZI(ch){for(var i=0;i<ZONES.length;i++){if(ch>=ZONES[i].from&&ch<=ZONES[i].to)return i;}return 4;}
-function atkTotal(){return hero.atk+(equip.w?equip.w.atk:0);}
-function defTotal(){return hero.def+(equip.a?equip.a.def:0);}
-function hasSkill(id){return ul.indexOf(id)!==-1;}
-
-// ── HARİTA ──
-function showMap(){updateMap();go('s-map');}
-function updateMap(){
-  var zi=getZI(chapter);
-  document.getElementById('m-prog').textContent=(chapter-1)+'/250';
-  document.getElementById('m-pbar').style.width=Math.round(((chapter-1)/250)*100)+'%';
-  document.getElementById('m-emoji').textContent=CHARS[selChar].emoji;
-  document.getElementById('m-name').textContent=hero.name;
-  document.getElementById('m-lv').textContent=hero.level;
-  document.getElementById('m-sp').textContent=sp;
-  document.getElementById('m-gold').textContent=gold;
-  document.getElementById('m-hp').textContent=hero.hp+'/'+hero.maxHp;
-  document.getElementById('m-mp').textContent=hero.mp+'/'+hero.maxMp;
-  document.getElementById('m-atk').textContent=atkTotal();
-  document.getElementById('m-def').textContent=defTotal();
-  document.getElementById('m-ch').textContent=chapter;
-  document.getElementById('m-qc').textContent=quests.filter(function(q){return !(qprog[q.id]>=q.g);}).length;
-  document.getElementById('m-p2').style.display=coop?'block':'none';
-  var pos=[[8,43],[30,27],[50,43],[68,27],[86,38]];
-  var p=pos[zi]||pos[0];
-  document.getElementById('hdot').style.left=p[0]+'%';
-  document.getElementById('hdot').style.top=p[1]+'%';
-  for(var i=0;i<5;i++) document.getElementById('mz'+i).classList.toggle('active',i===zi);
-  var se=document.getElementById('mz-sec');var sh=document.getElementById('sec-hint');
-  if(secretOn){se.style.display='flex';sh.style.display='block';}else{se.style.display='none';sh.style.display='none';}
-  var z=getZone(chapter);var sts=STORIES[zi];
-  var si=Math.min(Math.floor((chapter-(z.from||1))/17),sts.length-1);
-  var sb=document.getElementById('m-story');sb.style.display='block';sb.textContent='📜 '+sts[Math.max(0,si)];
-  document.getElementById('m-equip').textContent=(equip.w?equip.w.e+' '+equip.w.n:'Silahsız')+' | '+(equip.a?equip.a.e+' '+equip.a.n:'Zırhsız');
-  document.getElementById('m-badges').innerHTML=badges.map(function(b){return '<span style="font-size:17px;">'+b+'</span>';}).join('');
-}
-function goZone(zi){if(ZONES[zi].from>chapter)toast('Önce bölüm '+chapter+' geç!');}
-
-// ── GİZLİ ──
-function enterSecret(){curSecret=SECRETS[Math.floor(Math.random()*SECRETS.length)];document.getElementById('sec-title').textContent=curSecret.title;document.getElementById('sec-desc').textContent=curSecret.desc;go('s-secret');}
-
-// ── ANİMASYON YARDIMCILARI ──
-function animHero(cls){
-  var el=document.getElementById('hero-sprite');
-  el.classList.remove('attack-anim','magic-anim','hurt-anim');
-  void el.offsetWidth;
-  el.classList.add(cls);
-}
-function animEnemy(cls){
-  var el=document.getElementById('enemy-sprite');
-  el.classList.remove('enemy-hurt','enemy-attack','enemy-dead');
-  void el.offsetWidth;
-  el.classList.add(cls);
-}
-function flashArena(color){
-  var f=document.getElementById('arena-flash');
-  f.style.background=color;f.style.opacity='0.35';
-  setTimeout(function(){f.style.opacity='0';},150);
-}
-function spawnDmgNum(num,color,isEnemy){
-  var arena=document.getElementById('arena');
-  var el=document.createElement('div');
-  el.className='dmg-num';
-  el.textContent=(num>0?'-':'')+Math.abs(num);
-  el.style.color=color;
-  el.style.left=isEnemy?(50+Math.random()*25)+'%':(10+Math.random()*20)+'%';
-  el.style.top=(30+Math.random()*20)+'%';
-  arena.appendChild(el);
-  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},950);
-}
-function spawnMagicStars(){
-  var arena=document.getElementById('arena');
-  var stars=['✨','⭐','💫','🌟','✦'];
-  for(var i=0;i<5;i++){
-    (function(){
-      var el=document.createElement('div');
-      el.className='magic-star';
-      el.textContent=stars[Math.floor(Math.random()*stars.length)];
-      el.style.left=(40+Math.random()*40)+'%';
-      el.style.top=(10+Math.random()*50)+'%';
-      el.style.animationDelay=(Math.random()*0.3)+'s';
-      arena.appendChild(el);
-      setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},900);
-    }());
+  // Düşmanlar
+  var eCount=3+Math.floor(ch*1.5);
+  chapterEnemies=eCount;
+  var ETYPES=getEnemyTypes(ch);
+  for(var j=0;j<eCount;j++){
+    var et=ETYPES[Math.floor(Math.random()*ETYPES.length)];
+    enemies.push({
+      x:400+j*220+Math.random()*100,
+      y:base-et.h,
+      w:et.w,h:et.h,
+      vx:et.speed*(Math.random()>0.5?1:-1),vy:0,
+      hp:et.hp,maxHp:et.hp,
+      atk:et.atk,
+      onGround:false,
+      type:et.type,
+      emoji:et.emoji,
+      color:et.color,
+      dead:false,
+      deathTimer:0,
+      shootTimer:Math.random()*120,
+      patrol:true,
+      startX:400+j*220,
+      gold:et.gold,
+      xp:et.xp,
+      flash:0
+    });
   }
 }
 
-// ── SAVAŞ ──
-function enterBattle(sec){
-  isSecret=sec;
-  if(sec&&curSecret){
-    enemy={emoji:curSecret.enemy.emoji,name:curSecret.enemy.name,hp:curSecret.enemy.hp,maxHp:curSecret.enemy.maxHp,atk:curSecret.enemy.atk,def:curSecret.enemy.def};
-    sf++;setupBattle('🔮 Gizli: '+curSecret.title);
+function getEnemyTypes(ch){
+  var base=[];
+  var diff=Math.min(ch,20);
+  if(ch<=50){
+    base=[
+      {type:'goblin',emoji:'👺',color:'#2ecc71',w:28,h:36,hp:30+diff*8,atk:4+diff,speed:1.5+diff*0.1,gold:8+ch,xp:15+ch,shoot:false},
+      {type:'wolf',emoji:'🐺',color:'#95a5a6',w:32,h:30,hp:20+diff*6,atk:6+diff,speed:2.5+diff*0.15,gold:6+ch,xp:12+ch,shoot:false}
+    ];
+  } else if(ch<=100){
+    base=[
+      {type:'giant',emoji:'🗿',color:'#7f8c8d',w:44,h:52,hp:80+diff*12,atk:8+diff,speed:1+diff*0.05,gold:15+ch,xp:25+ch,shoot:false},
+      {type:'eagle',emoji:'🦅',color:'#e67e22',w:32,h:28,hp:40+diff*8,atk:10+diff,speed:3+diff*0.1,gold:12+ch,xp:20+ch,shoot:true}
+    ];
+  } else if(ch<=150){
+    base=[
+      {type:'dragon',emoji:'🐉',color:'#e74c3c',w:48,h:44,hp:120+diff*15,atk:14+diff,speed:1.5+diff*0.08,gold:20+ch,xp:35+ch,shoot:true},
+      {type:'fire',emoji:'🔥',color:'#e67e22',w:28,h:32,hp:60+diff*10,atk:12+diff,speed:2+diff*0.1,gold:15+ch,xp:28+ch,shoot:true}
+    ];
+  } else if(ch<=200){
+    base=[
+      {type:'vampire',emoji:'🧛',color:'#9b59b6',w:36,h:44,hp:150+diff*18,atk:16+diff,speed:2+diff*0.1,gold:25+ch,xp:40+ch,shoot:true},
+      {type:'skeleton',emoji:'💀',color:'#bdc3c7',w:30,h:42,hp:100+diff*12,atk:12+diff,speed:1.8+diff*0.1,gold:20+ch,xp:35+ch,shoot:false}
+    ];
   } else {
-    var z=getZone(chapter);var zi=getZI(chapter);
-    var diff=Math.max(1,Math.floor((chapter-1)/10));
-    var eb=z.e[Math.floor(Math.random()*z.e.length)];
-    var boss=chapter%50===0;var mult=boss?3:1;
-    enemy={emoji:boss?'👑':eb.e,name:boss?'👑 PATRON: '+eb.n:eb.n,hp:Math.round((30+diff*15)*mult),maxHp:Math.round((30+diff*15)*mult),atk:Math.round((5+diff*2)*mult),def:Math.round((2+diff)*mult)};
-    seen[eb.n]=true;
-    var sts=STORIES[zi];var si=Math.min(Math.floor((chapter-(z.from||1))/17),sts.length-1);
-    var bs=document.getElementById('b-story');
-    if(boss||chapter%10===0){bs.style.display='block';bs.textContent='📜 '+(boss?eb.l:sts[Math.max(0,si)]);}
-    else bs.style.display='none';
-    setupBattle('Bölüm '+chapter+(boss?' 👑 PATRON!':''));
+    base=[
+      {type:'robot',emoji:'🤖',color:'#3498db',w:44,h:48,hp:200+diff*20,atk:20+diff,speed:2.5+diff*0.1,gold:35+ch,xp:50+ch,shoot:true},
+      {type:'mech',emoji:'⚙️',color:'#95a5a6',w:52,h:56,hp:300+diff*25,atk:25+diff,speed:1.5+diff*0.05,gold:40+ch,xp:60+ch,shoot:true}
+    ];
   }
-  tb++;go('s-battle');
-}
-function setupBattle(label){
-  defending=false;frozen=0;immortUsed=false;
-  document.getElementById('b-label').textContent=label;
-  var z=getZone(chapter);
-  document.getElementById('b-zone').innerHTML='<span class="zbadge '+z.cls+'">'+z.name+'</span>';
-  // ARENA güncelle
-  document.getElementById('hero-sprite').textContent=CHARS[selChar].emoji;
-  document.getElementById('hero-sprite').className='';// animasyonu sıfırla
-  var eSprite=document.getElementById('enemy-sprite');
-  eSprite.textContent=enemy.emoji;
-  eSprite.className='';
-  document.getElementById('arena-info').textContent=label.toUpperCase();
-  document.getElementById('hero-name-arena').textContent=hero.name;
-  document.getElementById('enemy-name-arena').textContent=enemy.name;
-  document.getElementById('bar-hname').textContent=hero.name;
-  document.getElementById('bar-ename').textContent=enemy.name;
-  document.getElementById('b-eatk').textContent=enemy.atk;
-  var p2p=document.getElementById('p2panel');
-  if(coop){p2p.style.display='block';document.getElementById('p2emoji').textContent=p2.emoji;document.getElementById('p2name').textContent=p2.name;document.getElementById('p2hp').textContent=p2.hp+'/'+p2.maxHp;document.getElementById('bar-p2hp').style.width='100%';}
-  else p2p.style.display='none';
-  var bsp=document.getElementById('btn-sp');
-  if(hasSkill('s9')){bsp.style.display='block';}else bsp.style.display='none';
-  clearLog();
-  log('⚔️ '+enemy.name+' sahaya çıktı!','system');
-  updateBattle();setBtns(true);
-}
-function updateBattle(){
-  document.getElementById('b-hhp').textContent=hero.hp+'/'+hero.maxHp;
-  document.getElementById('b-hmp').textContent=hero.mp+'/'+hero.maxMp;
-  document.getElementById('bar-hhp').style.width=Math.max(0,Math.round((hero.hp/hero.maxHp)*100))+'%';
-  document.getElementById('bar-hmp').style.width=Math.max(0,Math.round((hero.mp/hero.maxMp)*100))+'%';
-  document.getElementById('b-ehp').textContent=Math.max(0,enemy.hp)+'/'+enemy.maxHp;
-  document.getElementById('bar-ehp').style.width=Math.max(0,Math.round((enemy.hp/enemy.maxHp)*100))+'%';
-  document.getElementById('pot-count').textContent='İksir ('+potions+')';
-  if(coop){document.getElementById('p2hp').textContent=p2.hp+'/'+p2.maxHp;document.getElementById('bar-p2hp').style.width=Math.max(0,Math.round((p2.hp/p2.maxHp)*100))+'%';}
-}
-function setBtns(e){document.querySelectorAll('#action-btns button').forEach(function(b){b.disabled=!e;});}
-
-function p2Act(type){
-  if(!coop)return;
-  if(type==='attack'){var d=Math.max(1,p2.atk-enemy.def+Math.floor(Math.random()*5));enemy.hp-=d;log('👥 P2 saldırdı: '+d+' hasar!','magic');spawnDmgNum(d,'#e67e22',true);}
-  else{p2.hp=Math.min(p2.maxHp,p2.hp+25);log('👥 P2 iyileştirdi: +25HP','heal');}
-  updateBattle();
-  if(enemy.hp<=0)setTimeout(winBattle,300);
-}
-
-function act(type){
-  setBtns(false);defending=false;
-  var ma=atkTotal();var dmg=0;var msg='';var cls='';
-  var rainbow=cosm.indexOf('c1')!==-1;
-
-  if(type==='attack'){
-    // KahraCiyanın saldırı animasyonu
-    animHero('attack-anim');
-    setTimeout(function(){
-      dmg=Math.max(1,ma-enemy.def+Math.floor(Math.random()*6));
-      if(hasSkill('s2')) dmg=Math.round(dmg*1.5);
-      var crit=hasSkill('s5')&&Math.random()<0.25;
-      if(crit){dmg*=3;msg='💥 KRİTİK! ';}
-      enemy.hp-=dmg;tdmg+=dmg;
-      animEnemy('enemy-hurt');
-      flashArena(crit?'#f1c40f33':'#e74c3c22');
-      spawnDmgNum(dmg,crit?'#f1c40f':'#ff6b6b',true);
-      msg+='⚔️ '+dmg+' hasar verdin!';cls='hit';
-      if(hasSkill('s3')) hero.hp=Math.min(hero.maxHp,hero.hp+5);
-      log(msg,cls);updateBattle();
-      if(enemy.hp<=0){setTimeout(winBattle,600);return;}
-      setTimeout(enemyTurn,900);
-    },300);
-
-  } else if(type==='magic'){
-    if(hero.mp<20){log('❌ Mana yok!','miss');setBtns(true);return;}
-    hero.mp-=20;
-    animHero('magic-anim');
-    spawnMagicStars();
-    setTimeout(function(){
-      dmg=Math.max(2,Math.floor(ma*1.8)-Math.floor(enemy.def/2)+Math.floor(Math.random()*8));
-      if(hasSkill('s1')) dmg*=2;
-      enemy.hp-=dmg;tdmg+=dmg;md+=dmg;
-      qProgress('mdmg',dmg);
-      animEnemy('enemy-hurt');
-      flashArena('#8e44ad33');
-      spawnDmgNum(dmg,'#a29bfe',true);
-      msg='✨ Büyü! '+dmg+' hasar verdin!';cls='magic';
-      if(hasSkill('s3')) hero.hp=Math.min(hero.maxHp,hero.hp+5);
-      log(msg,cls);updateBattle();
-      if(enemy.hp<=0){setTimeout(winBattle,600);return;}
-      setTimeout(enemyTurn,900);
-    },400);
-
-  } else if(type==='special'){
-    if(!hasSkill('s9')){setBtns(true);return;}
-    spawnMagicStars();
-    flashArena('#3498db33');
-    frozen=2;msg='🌀 Düşman 2 tur donduruldu!';cls='magic';
-    log(msg,cls);
-    if(hasSkill('s3')) hero.hp=Math.min(hero.maxHp,hero.hp+5);
-    updateBattle();setTimeout(enemyTurn,700);
-
-  } else if(type==='defend'){
-    defending=true;hero.mp=Math.min(hero.maxMp,hero.mp+10);
-    msg='🛡️ Savunmaya geçtin! (+10 MP)';
-    log(msg,'');
-    flashArena('#2980b922');
-    if(hasSkill('s3')) hero.hp=Math.min(hero.maxHp,hero.hp+5);
-    updateBattle();setTimeout(enemyTurn,700);
-
-  } else if(type==='potion'){
-    if(potions<=0){log('❌ İksir kalmadı!','miss');setBtns(true);return;}
-    potions--;var heal=30;
-    hero.hp=Math.min(hero.maxHp,hero.hp+heal);
-    spawnDmgNum(-heal,'#2ecc71',false);
-    flashArena('#27ae6022');
-    msg='🧪 İksir içtin! +'+heal+' HP ('+potions+' kaldı)';cls='heal';
-    log(msg,cls);
-    if(hasSkill('s3')) hero.hp=Math.min(hero.maxHp,hero.hp+5);
-    updateBattle();setTimeout(enemyTurn,700);
+  // Boss her 50 bölümde
+  if(ch%50===0){
+    base=[{type:'BOSS',emoji:['👑','🐲','🌑','🛸'][Math.floor(ch/50)-1]||'💀',color:'#f1c40f',w:64,h:64,hp:500+ch*10,atk:30+ch,speed:1.8,gold:200+ch*3,xp:200+ch*2,shoot:true}];
   }
+  return base;
 }
 
-function enemyTurn(){
-  if(frozen>0){
-    frozen--;
-    log('❄️ '+enemy.name+' donmuş, hareket edemedi!','magic');
-    flashArena('#3498db22');
-    updateBattle();setBtns(true);return;
-  }
-  var md2=defTotal();var dm=defending?0.4:1;
-  var d=Math.max(1,Math.round((enemy.atk-md2+Math.floor(Math.random()*5))*dm));
-  animEnemy('enemy-attack');
-  setTimeout(function(){
-    hero.hp-=d;tdmgr+=d;
-    if(hero.hp<=0&&hasSkill('s8')&&!immortUsed){hero.hp=1;immortUsed=true;log('🌟 ÖLÜMSÜZLÜK! 1 HP ile kaldın!','system');}
-    if(hero.hp<0) hero.hp=0;
-    animHero('hurt-anim');
-    flashArena('#e74c3c33');
-    spawnDmgNum(d,'#ff6b6b',false);
-    log('🔴 '+enemy.name+' sana '+d+' hasar verdi!'+(defending?' (Savunma ile azaltıldı)':''),'hit');
-    updateBattle();
-    if(hero.hp<=0){setTimeout(loseBattle,600);return;}
-    hero.mp=Math.min(hero.maxMp,hero.mp+5);
-    setBtns(true);
-  },300);
+// ── SAVAŞ BUTONLARI ──
+var mouse={x:0,y:0};
+var attackCooldown=0;
+var magicCooldown=0;
+window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
+window.addEventListener('mousedown',function(e){
+  if(shopOpen||lvlUpOpen||dead)return;
+  if(e.button===0) meleeAttack();
+  if(e.button===2) castMagic();
+  e.preventDefault();
+});
+window.addEventListener('contextmenu',function(e){e.preventDefault();});
+
+function meleeAttack(){
+  if(attackCooldown>0)return;
+  var range=80;
+  var dir=mouse.x>P.x+C.getBoundingClientRect().left-CAM.x?1:-1;
+  attackCooldown=18;
+  // Görsel efekt
+  particles.push({x:P.x+dir*40,y:P.y-P.h/2,vx:dir*3,vy:-1,life:15,color:'#e74c3c',size:18,type:'slash'});
+  spawnFloatText('⚔️',P.x,P.y-60,'#e74c3c');
+  // Düşmanlara hasar
+  enemies.forEach(function(e){
+    if(e.dead)return;
+    var dist=Math.abs((e.x+e.w/2)-(P.x));
+    if(dist<range+e.w/2){
+      var dmg=Math.max(1,P.atk+(P.equip.w?P.equip.w.atk:0)-Math.floor(e.atk*0.2)+Math.floor(Math.random()*6));
+      var crit=P.skills.indexOf('s5')!==-1&&Math.random()<0.25;
+      if(crit){dmg*=3;}
+      e.hp-=dmg;
+      e.flash=8;
+      e.vx+=dir*5;
+      spawnFloatText((crit?'💥 CRIT! ':'')+dmg,e.x+e.w/2,e.y-20,'#ff6b6b',crit?28:20);
+      particles.push({x:e.x+e.w/2,y:e.y,vx:dir*2,vy:-3,life:20,color:'#e74c3c',size:12,type:'blood'});
+      if(e.hp<=0) killEnemy(e);
+    }
+  });
 }
 
-function winBattle(){
-  animEnemy('enemy-dead');
-  kc++;ws++;tw++;cpd++;if(ws>mws)mws=ws;if(hero.hp===1)sv++;
-  qProgress('kill',1);if(ws>=5)qProgress('ws',1);qProgress('chs',1);
-  if(chapter%50===0){bc++;qProgress('boss',1);}
-  var eg=Math.round(10+chapter*2+Math.random()*10);
-  if(isSecret&&curSecret) eg*=curSecret.gm;
-  if(enemy.customRew==='gold') eg+=200;
-  gold+=eg;ge+=eg;qProgress('gold',eg);
-  if(chapter%25===0&&!secretOn) secretOn=true;
-  hero.xp=(hero.xp||0)+Math.round(20+chapter*2);
-  var lvup=false;
-  while(hero.xp>=100*hero.level*hero.level){hero.xp-=100*hero.level*hero.level;hero.level++;hero.maxHp+=10;hero.hp=Math.min(hero.maxHp,hero.hp+20);hero.maxMp+=5;hero.mp=Math.min(hero.maxMp,hero.mp+10);hero.atk+=2;hero.def+=1;sp++;lvup=true;}
-  var newAch=checkAch();
-  var desc='+ '+eg+' 💰 altın kazandın!'+(isSecret?' (GİZLİ BONUS!)':'')+(lvup?'\n⬆️ Seviye '+hero.level+'! Güçlendin!':'');
-  var spec=null;
-  if(!isSecret){
-    if(chapter%50===0){var rp2=RPARTS[Math.floor((chapter/50)-1)];if(rp2){rparts.push(rp2);spec='🤖 Robot Parçası: '+rp2;}confetti();}
-    if(chapter%10===0){var nb=['🥉','🥈','🥇','💎','👑','🌟','🏅','🎖️','🔮','⭐'][Math.floor((chapter/10)-1)%10];badges.push(nb);if(!spec)spec='Rozet kazandın: '+nb;}
-  } else {
-    if(enemy.customRew==='item')spec='🎁 Gizemli Eşya!';
-    if(enemy.customRew==='xp'){sp+=3;spec='⭐ +3 Yetenek Puanı!';}
-    confetti();
-  }
-  if(lvup)confetti();
-  setTimeout(function(){
-    document.getElementById('r-emoji').textContent=chapter%50===0?'🏆':isSecret?'🔮':'🎉';
-    document.getElementById('r-title').textContent=isSecret?'Gizli Zafer!':'Zafer!';
-    document.getElementById('r-desc').textContent=desc;
-    if(spec){document.getElementById('r-special').style.display='block';document.getElementById('r-spec-txt').textContent=spec;}
-    else document.getElementById('r-special').style.display='none';
-    var rachEl=document.getElementById('r-ach');
-    if(newAch.length>0){rachEl.style.display='block';document.getElementById('r-ach-txt').textContent=newAch.map(function(a){return a.e+' '+a.n;}).join(', ');confetti();}
-    else rachEl.style.display='none';
-    if(!isSecret&&chapter>=250){showWin();return;}
-    go('s-reward');
-  },700);
+function castMagic(){
+  if(magicCooldown>0||P.mp<20)return;
+  P.mp-=20;
+  magicCooldown=30;
+  var cx=P.x;var cy=P.y-P.h/2;
+  var tx=mouse.x-C.getBoundingClientRect().left+CAM.x;
+  var ty=mouse.y+CAM.y;
+  var dx=tx-cx;var dy=ty-cy;
+  var len=Math.sqrt(dx*dx+dy*dy);
+  var spd=11;
+  var emoji=P.skills.indexOf('s1')!==-1?'🔥':'✨';
+  projectiles.push({x:cx,y:cy,vx:(dx/len)*spd,vy:(dy/len)*spd,life:80,dmg:Math.floor(P.atk*1.8+(P.equip.w?P.equip.w.atk:0)),magic:true,emoji:emoji,size:22,owner:'player'});
+  spawnFloatText(emoji,cx,cy-30,'#a29bfe');
+  updateMP();
 }
-
-function loseBattle(){
-  ws=0;
-  hero.hp=Math.round(hero.maxHp*0.5);hero.mp=Math.round(hero.maxMp*0.5);potions=Math.max(potions,1);
-  document.getElementById('r-emoji').textContent='💀';
-  document.getElementById('r-title').textContent='Yenildin!';
-  document.getElementById('r-desc').textContent='HP yarıya indi.\nMağazadan güçlen ve tekrar dene!';
-  document.getElementById('r-special').style.display='none';
-  document.getElementById('r-ach').style.display='none';
-  go('s-reward');
-}
-function nextCh(){if(!isSecret&&hero.hp>0&&enemy.hp<=0)chapter++;isSecret=false;curSecret=null;if(chapter>250){showWin();return;}showMap();}
-function showWin(){confetti();confetti();confetti();document.getElementById('win-badges').innerHTML=badges.map(function(b){return '<span style="font-size:22px;">'+b+'</span>';}).join('');go('s-win');}
-
-// ── LOG ──
-function clearLog(){document.getElementById('log').innerHTML='';}
-function log(msg,cls){var el=document.getElementById('log');var p=document.createElement('p');if(cls)p.className=cls;p.textContent=msg;el.appendChild(p);el.scrollTop=el.scrollHeight;}
-
-// ── EFEKTLER ──
-function toast(msg){var el=document.createElement('div');el.className='toast';el.textContent=msg;document.getElementById('fx').appendChild(el);setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},2200);}
-function confetti(){var o=document.getElementById('fx');var cols=['#e74c3c','#2ecc71','#3498db','#f1c40f','#9b59b6','#e67e22'];for(var i=0;i<24;i++){var d=document.createElement('div');d.className='cfetti';d.style.background=cols[Math.floor(Math.random()*cols.length)];d.style.left=Math.random()*90+'%';d.style.top=Math.random()*20+'%';d.style.animationDelay=Math.random()*0.5+'s';o.appendChild(d);(function(el){setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},2000);}(d));}}
-
-// ── GÖREVLER ──
-function genQ(){var sh=QT.slice().sort(function(){return Math.random()-0.5;});quests=sh.slice(0,3);qprog={};quests.forEach(function(q){qprog[q.id]=0;});}
-function refreshQ(){if(confirm('Görevler yenilensin mi?')){genQ();renderQ();}}
-function qProgress(type,amt){quests.forEach(function(q){if(q.t===type&&qprog[q.id]<q.g){qprog[q.id]=(qprog[q.id]||0)+amt;if(qprog[q.id]>=q.g){qprog[q.id]=q.g;qdone++;if(q.rt==='gold')gold+=q.r;if(q.rt==='sp')sp+=q.r;toast('📋 Görev Tamamlandı! +'+q.r+(q.rt==='gold'?'💰':'🌳'));confetti();}}});}
-function renderQ(){
-  document.getElementById('q-done-cnt').textContent=qdone+' görev tamamlandı';
-  document.getElementById('q-list').innerHTML=quests.map(function(q){var pg=qprog[q.id]||0;var done=pg>=q.g;var pct=Math.round((pg/q.g)*100);return '<div class="qcard '+(done?'done':'')+'"><div style="font-size:24px;">'+(done?'✅':'📋')+'</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;">'+q.n+'</div><div style="font-size:11px;color:#aaa;margin-top:2px;">'+q.d+'</div><div class="qbar" style="margin-top:5px;"><div class="qbfill" style="width:'+pct+'%"></div></div><div style="font-size:10px;color:#777;margin-top:2px;">'+pg+'/'+q.g+' · Ödül: +'+q.r+(q.rt==='gold'?'💰':'🌳')+'</div></div></div>';}).join('');
-}
-
-// ── YETENEKLER ──
-function renderSkills(){
-  document.getElementById('sk-pts').textContent=sp;
-  document.getElementById('sk-grid').innerHTML=SKILLS.map(function(s){var isU=hasSkill(s.id);var ok=!s.req||hasSkill(s.req);var cls=isU?'unlocked':ok?'avail':'locked';return '<div class="snode '+cls+'" onclick="unlockSkill(\''+s.id+'\')"><div style="font-size:26px;margin-bottom:4px;">'+s.e+'</div><div style="font-size:12px;font-weight:700;color:#fff;">'+s.n+'</div><div style="font-size:10px;color:#aaa;margin-top:2px;">'+s.d+'</div><div style="font-size:10px;color:#9b59b6;margin-top:4px;">'+(isU?'✅ Öğrenildi':'🌳 '+s.c+' puan')+'</div></div>';}).join('');
-}
-function unlockSkill(id){var s=null;for(var i=0;i<SKILLS.length;i++){if(SKILLS[i].id===id){s=SKILLS[i];break;}}if(!s||hasSkill(id))return;if(s.req&&!hasSkill(s.req)){toast('Önce önceki yeteneği öğren!');return;}if(sp<s.c){toast('Yetenek puanı yok!');return;}sp-=s.c;ul.push(id);if(id==='s4')hero.def+=10;if(id==='s7')hero.atk+=20;if(id==='s6'){hero.maxMp+=50;hero.mp=Math.min(hero.maxMp,hero.mp+50);}toast('✨ '+s.n+' öğrenildi!');renderSkills();}
-
-// ── ANSİKLOPEDİ ──
-function renderBestiary(){var all=[];ZONES.forEach(function(z){z.e.forEach(function(e){all.push({emoji:e.e,name:e.n,lore:e.l});});});document.getElementById('b-grid').innerHTML=all.map(function(e){var s=!!seen[e.name];return '<div class="bcard '+(s?'seen':'unseen')+'"><div style="font-size:32px;">'+e.emoji+'</div><div style="font-size:12px;font-weight:700;color:#fff;margin-top:4px;">'+(s?e.name:'???')+'</div><div style="font-size:10px;color:#aaa;margin-top:3px;">'+(s?e.lore:'Bilinmiyor.')+'</div></div>';}).join('');}
-
-// ── EDİTÖR ──
-function renderEditor(){document.getElementById('ed-enemies').innerHTML=ALL_E.map(function(e,i){return '<div class="ecard '+(edEnemy.n===e.n?'sel':'')+'" onclick="pickEdEnemy('+i+')">'+e.e+'<div style="font-size:9px;color:#aaa;">'+e.n+'</div></div>';}).join('');updateEdPrev();}
-function pickEdEnemy(i){edEnemy=ALL_E[i];renderEditor();}
-function setDiff(d){edDiff=d;['easy','medium','hard'].forEach(function(x){document.getElementById('ed-'+x).classList.toggle('btn-p',x===d);});updateEdPrev();}
-function setRew(r){edRew=r;['gold','item','xp'].forEach(function(x){document.getElementById('ed-'+x).classList.toggle('btn-p',x===r);});updateEdPrev();}
-function updateEdPrev(){var dm={easy:'Kolay(HP:50,ATK:5)',medium:'Orta(HP:150,ATK:20)',hard:'Zor(HP:350,ATK:40)'};var rm={gold:'💰 200 Altın',item:'🎁 Rastgele Eşya',xp:'⭐ +3 Yetenek Puanı'};var p=document.getElementById('ed-preview');if(p)p.innerHTML='Düşman: '+edEnemy.e+' '+edEnemy.n+'<br>Zorluk: '+(dm[edDiff]||dm.medium)+'<br>Ödül: '+rm[edRew];}
-function playCustom(){var dc={easy:{hp:50,atk:5,def:2},medium:{hp:150,atk:20,def:8},hard:{hp:350,atk:40,def:18}};var cfg=dc[edDiff]||dc.medium;isSecret=false;enemy={emoji:edEnemy.e,name:'[Özel] '+edEnemy.n,hp:cfg.hp,maxHp:cfg.hp,atk:cfg.atk,def:cfg.def,customRew:edRew};setupBattle('🗺️ Özel Bölüm');go('s-battle');}
 
 // ── MAĞAZA ──
-function showTab(t){shopTab=t;['w','a','p','c'].forEach(function(x){document.getElementById('tab-'+x).classList.toggle('active',x===t);});renderShop();}
-function renderShop(){
-  document.getElementById('sh-gold').textContent=gold;
-  var items=SHOP[shopTab]||[];
-  document.getElementById('sh-items').innerHTML=items.map(function(item){var isEq=(shopTab==='w'&&equip.w&&equip.w.id===item.id)||(shopTab==='a'&&equip.a&&equip.a.id===item.id);var isCos=item.cos&&cosm.indexOf(item.id)!==-1;var can=gold>=item.p;var bst=(isEq||isCos)?'background:#27ae60;color:#fff;border-color:#27ae60;':can?'background:#e67e22;color:#fff;border-color:#e67e22;':'';return '<div style="display:flex;align-items:center;gap:9px;padding:11px;border:1px solid #2a2a4a;border-radius:10px;margin-bottom:8px;background:#12122a;"><div style="font-size:28px;">'+item.e+'</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;">'+item.n+'</div><div style="font-size:11px;color:#aaa;">'+item.s+'</div></div><div style="text-align:right;"><div style="font-size:13px;color:#e67e22;font-weight:700;margin-bottom:5px;">💰'+item.p+'</div><button class="btn btn-sm" style="'+bst+'" onclick="buyItem(\''+shopTab+'\',\''+item.id+'\')" '+((isEq||isCos||!can)?'disabled':'')+'>'+((isEq||isCos)?'✅ Alındı':can?'Satın Al':'❌')+'</button></div></div>';}).join('');
+var SHOP_ITEMS=[
+  {id:'w1',e:'🗡️',n:'Demir Kılıç',s:'+5 ATK',atk:5,def:0,hp:0,p:50,type:'w'},
+  {id:'w2',e:'⚔️',n:'Çelik Kılıç',s:'+12 ATK',atk:12,def:0,hp:0,p:130,type:'w'},
+  {id:'w3',e:'🔱',n:'Ejderha Mızrağı',s:'+22 ATK',atk:22,def:0,hp:0,p:280,type:'w'},
+  {id:'w4',e:'🌟',n:'Efsanevi Kılıç',s:'+40 ATK',atk:40,def:0,hp:0,p:600,type:'w'},
+  {id:'a1',e:'🧥',n:'Deri Zırh',s:'+5 DEF +10 HP',atk:0,def:5,hp:10,p:50,type:'a'},
+  {id:'a2',e:'🛡️',n:'Zincir Zırh',s:'+12 DEF +20 HP',atk:0,def:12,hp:20,p:130,type:'a'},
+  {id:'a3',e:'🦺',n:'Plaket Zırh',s:'+22 DEF +40 HP',atk:0,def:22,hp:40,p:280,type:'a'},
+  {id:'p1',e:'🧪',n:'İksir (+30 HP)',s:'Anında kullan',atk:0,def:0,hp:30,p:30,type:'p'},
+  {id:'p2',e:'💧',n:'Mana İksiri (+30 MP)',s:'Anında kullan',atk:0,def:0,mp:30,p:30,type:'p'},
+];
+function openShop(){
+  if(dead||lvlUpOpen)return;
+  shopOpen=true;
+  var panel=document.getElementById('shop-panel');
+  panel.style.display='block';
+  var html='<div style="text-align:center;margin-bottom:10px;font-size:13px;color:#e67e22;">💰 '+P.gold+' altın</div>';
+  SHOP_ITEMS.forEach(function(item){
+    var isEq=(P.equip.w&&P.equip.w.id===item.id)||(P.equip.a&&P.equip.a.id===item.id);
+    var can=P.gold>=item.p;
+    html+='<div class="shop-item" onclick="buyItem(\''+item.id+\')" style="'+(isEq?'border-color:#27ae60;':'')+(can?'':'opacity:0.5;cursor:not-allowed;')+'">'
+      +'<span style="font-size:22px;">'+item.e+'</span>'
+      +'<div><div style="font-size:13px;font-weight:700;">'+item.n+'</div><div style="font-size:11px;color:#aaa;">'+item.s+'</div></div>'
+      +'<span class="price">'+(isEq?'✅':'💰'+item.p)+'</span>'
+      +'</div>';
+  });
+  document.getElementById('shop-items').innerHTML=html;
 }
-function buyItem(tab,id){var items=SHOP[tab]||[];var item=null;for(var i=0;i<items.length;i++){if(items[i].id===id){item=items[i];break;}}if(!item||gold<item.p)return;gold-=item.p;if(item.pot){potions++;hero.hp=Math.min(hero.maxHp,hero.hp+(item.hp||0));hero.mp=Math.min(hero.maxMp,hero.mp+(item.mp||0));toast('🧪 İksir alındı!');}else if(item.cos){cosm.push(item.id);toast('🎨 Kozmetik uygulandı!');}else if(tab==='w'){equip.w=item;toast('⚔️ '+item.n+' kuşanıldı!');}else if(tab==='a'){var old=equip.a?equip.a.hp:0;equip.a=item;hero.maxHp=CHARS[selChar].hp+(hero.level-1)*10+item.hp;hero.hp=Math.min(hero.maxHp,hero.hp+(item.hp-old));toast('🛡️ '+item.n+' giyildi!');}document.getElementById('sh-gold').textContent=gold;renderShop();}
+function closeShop(){shopOpen=false;document.getElementById('shop-panel').style.display='none';}
+function buyItem(id){
+  var item=null;
+  for(var i=0;i<SHOP_ITEMS.length;i++){if(SHOP_ITEMS[i].id===id){item=SHOP_ITEMS[i];break;}}
+  if(!item||P.gold<item.p)return;
+  P.gold-=item.p;
+  if(item.type==='w'){P.equip.w=item;spawnFloatText('⚔️ '+item.n,'#e67e22',P.y-60,'#e67e22');}
+  else if(item.type==='a'){P.equip.a=item;P.maxHp+=item.hp;P.hp=Math.min(P.maxHp,P.hp+item.hp);P.def+=item.def;}
+  else if(item.type==='p'){if(item.hp)P.hp=Math.min(P.maxHp,P.hp+(item.hp||0));if(item.mp)P.mp=Math.min(P.maxMp,P.mp+(item.mp||0));}
+  openShop();updateHUD();
+}
 
-// ── İSTATİSTİK ──
-function statsTab(t){stab=t;['s','a','r'].forEach(function(x){document.getElementById('st-'+x).classList.toggle('active',x===t);});renderStats();}
-function renderStats(){
-  var body=document.getElementById('stats-body');var wr=tb>0?Math.round((tw/tb)*100):0;
-  if(stab==='s'){
-    body.innerHTML='<div class="sgrid"><div class="scard"><div class="anum">'+kc+'</div><div class="albl">💀 Öldürülen</div></div><div class="scard"><div class="anum">'+bc+'</div><div class="albl">👑 Patron</div></div><div class="scard"><div class="anum">'+(chapter-1)+'</div><div class="albl">🗺️ Bölüm</div></div><div class="scard"><div class="anum">'+wr+'%</div><div class="albl">🏆 Kazanma</div></div><div class="scard"><div class="anum">'+gold+'</div><div class="albl">💰 Altın</div></div><div class="scard"><div class="anum">'+mws+'</div><div class="albl">🔥 En Uzun Seri</div></div></div><div class="card" style="padding:12px;"><div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;">📈 Hasar</div>'+barRow('⚔️ Verilen',tdmg,50,'#e74c3c')+barRow('💥 Alınan',tdmgr,50,'#e67e22')+barRow('✨ Büyü',md,50,'#8e44ad')+'</div>';
-  } else if(stab==='a'){
-    var st=achSt();var yes=ACH.filter(function(a){return a.f(st);});var no=ACH.filter(function(a){return !a.f(st);});
-    body.innerHTML='<div style="font-size:12px;color:#aaa;margin-bottom:8px;">🏅 '+yes.length+' / '+ACH.length+' başarım</div><div style="background:#1a1a2e;border-radius:8px;height:7px;overflow:hidden;margin-bottom:12px;"><div style="height:7px;background:#f1c40f;border-radius:3px;width:'+Math.round((yes.length/ACH.length)*100)+'%;"></div></div>'+yes.map(function(a){return '<div class="acard earned"><div style="font-size:28px;min-width:36px;text-align:center;">'+a.e+'</div><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:#fff;">'+a.n+'</div><div style="font-size:11px;color:#aaa;">'+a.d+'</div></div><span class="abadge">✅</span></div>';}).join('')+no.map(function(a){return '<div class="acard locked"><div style="font-size:28px;min-width:36px;text-align:center;">'+(a.sec?'🔒':a.e)+'</div><div style="flex:1;"><div style="font-size:13px;color:#fff;">'+(a.sec?'Gizli Başarım':a.n)+'</div><div style="font-size:11px;color:#aaa;">'+(a.sec?'Nasıl kazanılacağı bilinmiyor...':a.d)+'</div></div></div>';}).join('');
-  } else {
-    var rows=[['🔥 En Uzun Seri',mws,'#e67e22'],['💀 Öldürme',kc,'#e74c3c'],['💰 Maksimum Altın',Math.max(gold,ge),'#f1c40f'],['✨ Büyü Hasarı',md,'#8e44ad'],['🏅 Başarım',earned.length,'#27ae60'],['👑 Patron',bc,'#e67e22']];
-    body.innerHTML='<div class="card" style="padding:13px;"><div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:11px;">🏆 Kişisel Rekorlar</div>'+rows.map(function(r){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#1a1a2e;border-radius:8px;margin-bottom:6px;"><div style="font-size:12px;color:#ccc;">'+r[0]+'</div><div style="font-size:16px;font-weight:700;color:'+r[2]+';">'+r[1]+'</div></div>';}).join('')+'</div>';
+// ── LEVEL UP ──
+var SKILLS_LIST=[
+  {id:'s1',e:'🔥',n:'Ateş Topu',d:'Büyü hasarı x2'},
+  {id:'s2',e:'⚡',n:'Çift Vuruş',d:'Melee +50% hasar'},
+  {id:'s3',e:'💚',n:'Şifa',d:'Her saniye +1 HP'},
+  {id:'s4',e:'🛡️',n:'Demir Deri',d:'DEF +10'},
+  {id:'s5',e:'⭐',n:'Kritik',d:'%25 ihtimalle x3 hasar'},
+  {id:'s6',e:'🌀',n:'Mana Akışı',d:'MP max +50'},
+  {id:'s7',e:'👑',n:'Efsane Güç',d:'ATK kalıcı +20'},
+  {id:'s8',e:'🌟',n:'Ölümsüzlük',d:'Ölümde 1 HP kal (1x)'},
+  {id:'s9',e:'🔮',n:'Hızlı Atış',d:'Büyü cooldown yarıya'},
+];
+function showLevelUp(){
+  lvlUpOpen=true;
+  document.getElementById('lv-msg').textContent='Seviye '+P.level+'! Bir yetenek seç:';
+  var available=SKILLS_LIST.filter(function(s){return P.skills.indexOf(s.id)===-1;});
+  var picks=available.sort(function(){return Math.random()-0.5;}).slice(0,4);
+  var html=picks.map(function(s){
+    return '<div class="sk-btn" onclick="pickSkill(\''+s.id+'\')">'
+      +'<div style="font-size:24px;margin-bottom:4px;">'+s.e+'</div>'
+      +'<div style="font-weight:700;font-size:13px;">'+s.n+'</div>'
+      +'<div style="font-size:10px;color:#aaa;margin-top:2px;">'+s.d+'</div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('skills-grid').innerHTML=html;
+  document.getElementById('levelup').style.display='block';
+}
+function pickSkill(id){
+  P.skills.push(id);
+  if(id==='s4'){P.def+=10;spawnFloatTxtPlayer('🛡️ DEF +10','#74b9ff');}
+  if(id==='s6'){P.maxMp+=50;P.mp=Math.min(P.maxMp,P.mp+50);spawnFloatTxtPlayer('💧 MP +50','#3498db');}
+  if(id==='s7'){P.atk+=20;spawnFloatTxtPlayer('⚔️ ATK +20','#e74c3c');}
+  closeLevelUp();
+}
+function closeLevelUp(){lvlUpOpen=false;document.getElementById('levelup').style.display='none';}
+function spawnFloatTxtPlayer(txt,color){spawnFloatText(txt,P.x,P.y-80,color,18);}
+
+// ── DÜŞMAN YÖNETİMİ ──
+function killEnemy(e){
+  e.dead=true;e.deathTimer=30;
+  P.gold+=e.gold;P.xp+=e.xp;P.kc++;P.ws++;
+  if(P.ws>P.mws)P.mws=P.ws;
+  chapter=P.chapter;
+  // Patron mı?
+  if(e.type==='BOSS')P.bc++;
+  spawnFloatText('+'+e.gold+'💰',e.x+e.w/2,e.y-10,'#f1c40f',16);
+  spawnFloatText('+'+e.xp+'XP',e.x+e.w/2,e.y-30,'#a29bfe',14);
+  // Konfeti
+  for(var i=0;i<12;i++){
+    particles.push({x:e.x+e.w/2,y:e.y,vx:(Math.random()-0.5)*8,vy:-Math.random()*6-2,life:40,color:['#f1c40f','#e74c3c','#2ecc71','#3498db'][Math.floor(Math.random()*4)],size:8,type:'particle'});
+  }
+  // XP kontrolü
+  checkXP();
+  updateHUD();
+  // Tüm düşmanlar öldü mü?
+  var alive=enemies.filter(function(en){return !en.dead;});
+  if(alive.length===0){
+    setTimeout(nextChapter,1200);
   }
 }
-function barRow(label,val,div,color){return '<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:11px;color:#aaa;margin-bottom:3px;"><span>'+label+'</span><span>'+val+'</span></div><div style="background:#1a1a2e;border-radius:3px;height:6px;overflow:hidden;"><div style="height:6px;border-radius:3px;background:'+color+';width:'+Math.min(100,Math.round(val/div))+'%;"></div></div></div>';}
-function achSt(){return {kc:kc,bc:bc,ch:chapter,gold:gold,su:secretOn,md:md,ul:ul,rp:rparts,mws:mws,sv:sv};}
-function checkAch(){var st=achSt();var got=[];ACH.forEach(function(a){if(earned.indexOf(a.id)===-1&&a.f(st)){earned.push(a.id);got.push(a);}});return got;}
 
-// ── BAŞLAT ──
-showSaves();
-showTab('w');
-renderEditor();
+function checkXP(){
+  while(P.xp>=P.xpNext){
+    P.xp-=P.xpNext;
+    P.level++;
+    P.xpNext=Math.floor(100*Math.pow(1.4,P.level-1));
+    P.maxHp+=12;P.hp=Math.min(P.maxHp,P.hp+20);
+    P.maxMp+=6;P.mp=Math.min(P.maxMp,P.mp+10);
+    P.atk+=2;P.def+=1;
+    spawnFloatTxtPlayer('⬆️ SEVİYE '+P.level+'!','#f1c40f');
+    showLevelUp();
+  }
+}
+
+function nextChapter(){
+  P.chapter++;
+  if(P.chapter>250){showWin();return;}
+  spawnFloatTxtPlayer('✅ Bölüm '+P.chapter+' Başlıyor!','#2ecc71');
+  setTimeout(function(){
+    P.x=200;P.y=300;P.vx=0;P.vy=0;
+    genLevel(P.chapter);
+    CAM.x=0;
+  },600);
+}
+
+function showWin(){
+  alert('🏆 TEBRİKLER! 250 bölümü tamamladın! Efsane Robot Hediyesi 🤖');
+}
+
+// ── HUD ──
+function updateHUD(){
+  document.getElementById('hp-txt').textContent=P.hp+'/'+P.maxHp;
+  document.getElementById('mp-txt').textContent=Math.floor(P.mp)+'/'+P.maxMp;
+  document.getElementById('hp-fill').style.width=Math.max(0,(P.hp/P.maxHp)*100)+'%';
+  document.getElementById('mp-fill').style.width=Math.max(0,(P.mp/P.maxMp)*100)+'%';
+  document.getElementById('xp-fill').style.width=Math.max(0,(P.xp/P.xpNext)*100)+'%';
+  document.getElementById('lv-txt').textContent=P.level;
+  document.getElementById('gold-txt').textContent=P.gold;
+  document.getElementById('ch-txt').textContent=P.chapter;
+  document.getElementById('hero-icon').textContent=CHARS[P.char].emoji;
+}
+function updateMP(){updateHUD();}
+
+// ── FLOAT TEXT ──
+function spawnFloatText(txt,x,y,color,size){
+  var el=document.createElement('div');
+  el.className='float-txt';
+  el.textContent=txt;
+  el.style.color=color||'#fff';
+  el.style.fontSize=(size||16)+'px';
+  var rect=C.getBoundingClientRect();
+  el.style.left=(rect.left+x-CAM.x)+'px';
+  el.style.top=(rect.top+y-CAM.y)+'px';
+  document.getElementById('floating-texts').appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},1000);
+}
+
+// ── OYUNCU CİZİMİ ──
+function drawPlayer(){
+  ctx.save();
+  // Gölge
+  ctx.fillStyle='rgba(0,0,0,0.3)';
+  ctx.beginPath();ctx.ellipse(P.x,P.y+2,P.w/2,8,0,0,Math.PI*2);ctx.fill();
+  // Invincible flaş
+  if(P.invincible>0&&Math.floor(P.invincible/3)%2===0){ctx.restore();return;}
+  // Beden
+  var ch=CHARS[P.char];
+  ctx.fillStyle=P.equip.a?'#2c3e50':'#1a1a2e';
+  ctx.strokeStyle=ch.color;
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect(P.x-P.w/2,P.y-P.h,P.w,P.h,6);ctx.fill();ctx.stroke();
+  // Emoji karakter
+  ctx.font='28px serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(ch.emoji,P.x,P.y-P.h/2);
+  // Silah
+  if(P.equip.w){
+    ctx.font='16px serif';
+    var dir=P.vx>=0?1:-1;
+    ctx.fillText(P.equip.w.e,P.x+dir*22,P.y-P.h*0.3);
+  }
+  // Saldırı efekti
+  if(attackCooldown>12){
+    ctx.font='24px serif';
+    var d2=mouse.x>P.x+(C.getBoundingClientRect().left||0)-CAM.x?1:-1;
+    ctx.fillText('⚡',P.x+d2*45,P.y-P.h*0.5);
+  }
+  ctx.restore();
+}
+
+// ── DÜŞMAN ÇİZİMİ ──
+function drawEnemy(e){
+  if(e.dead){
+    if(e.deathTimer>0){
+      ctx.save();
+      ctx.globalAlpha=e.deathTimer/30;
+      ctx.font=(28+((30-e.deathTimer)*2))+'px serif';
+      ctx.textAlign='center';
+      ctx.fillText(e.emoji,e.x+e.w/2,e.y);
+      ctx.restore();
+    }
+    return;
+  }
+  ctx.save();
+  // Flash efekti
+  if(e.flash>0){ctx.filter='brightness(3)';}
+  // Gölge
+  ctx.fillStyle='rgba(0,0,0,0.25)';
+  ctx.beginPath();ctx.ellipse(e.x+e.w/2,e.y+2,e.w/2,7,0,0,Math.PI*2);ctx.fill();
+  // Beden
+  ctx.fillStyle=e.color+'33';
+  ctx.strokeStyle=e.color;
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect(e.x,e.y-e.h,e.w,e.h,6);ctx.fill();ctx.stroke();
+  // Emoji
+  ctx.font=(e.type==='BOSS'?40:26)+'px serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(e.emoji,e.x+e.w/2,e.y-e.h/2);
+  ctx.restore();
+  // HP Bar
+  var bw=e.w+8;var bh=6;var bx=e.x-4;var by=e.y-e.h-12;
+  ctx.fillStyle='#1a1a2e';ctx.beginPath();ctx.roundRect(bx,by,bw,bh,3);ctx.fill();
+  var pct=Math.max(0,e.hp/e.maxHp);
+  ctx.fillStyle=pct>0.5?'#27ae60':pct>0.25?'#e67e22':'#e74c3c';
+  ctx.beginPath();ctx.roundRect(bx,by,bw*pct,bh,3);ctx.fill();
+  // İsim (boss için)
+  if(e.type==='BOSS'){
+    ctx.fillStyle='#f1c40f';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('👑 '+e.emoji+' PATRON',e.x+e.w/2,e.y-e.h-20);
+  }
+}
+
+// ── PLATFORM ÇİZİMİ ──
+function drawPlatform(p){
+  ctx.save();
+  if(p.type==='ground'){
+    ctx.fillStyle='#0d0d1f';
+    ctx.fillRect(p.x-CAM.x,p.y-CAM.y,p.w,p.h);
+    // Zemin çizgisi
+    ctx.strokeStyle='#2a2a4a';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(p.x-CAM.x,p.y-CAM.y);ctx.lineTo(p.x+p.w-CAM.x,p.y-CAM.y);ctx.stroke();
+  } else {
+    var grd=ctx.createLinearGradient(p.x-CAM.x,p.y-CAM.y,p.x-CAM.x,p.y+p.h-CAM.y);
+    grd.addColorStop(0,p.color);grd.addColorStop(1,p.color+'66');
+    ctx.fillStyle=grd;
+    ctx.strokeStyle=p.color+'aa';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(p.x-CAM.x,p.y-CAM.y,p.w,p.h,4);ctx.fill();ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ── ARKA PLAN ──
+function drawBG(){
+  // Gradient arka plan
+  var grd=ctx.createLinearGradient(0,0,0,C.height);
+  grd.addColorStop(0,'#000010');
+  grd.addColorStop(0.6,'#0a0014');
+  grd.addColorStop(1,'#050510');
+  ctx.fillStyle=grd;
+  ctx.fillRect(0,0,C.width,C.height);
+  // Yıldızlar
+  ctx.fillStyle='#ffffff';
+  for(var i=0;i<60;i++){
+    var sx=(i*137+CAM.x*0.05)%C.width;
+    var sy=(i*79+CAM.y*0.05)%200;
+    var ss=Math.sin(Date.now()*0.001+i)*0.5+0.8;
+    ctx.globalAlpha=ss*0.4;
+    ctx.fillRect(sx,sy,1.5,1.5);
+  }
+  ctx.globalAlpha=1;
+  // Uzak dağlar
+  ctx.fillStyle='#0d0d2a';
+  for(var j=0;j<6;j++){
+    var mx=(j*200-CAM.x*0.1)%(C.width+200)-100;
+    var mh=80+j*20;
+    ctx.beginPath();ctx.moveTo(mx,C.height-60);ctx.lineTo(mx+100,C.height-60-mh);ctx.lineTo(mx+200,C.height-60);ctx.fill();
+  }
+  // Ay
+  ctx.fillStyle='#f1c40f22';
+  ctx.beginPath();ctx.arc(C.width-100-CAM.x*0.02,80,45,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#f1c40f11';
+  ctx.beginPath();ctx.arc(C.width-100-CAM.x*0.02,80,60,0,Math.PI*2);ctx.fill();
+}
+
+// ── FİZİK GÜNCELLEME ──
+var regenTimer=0;
+function update(){
+  if(dead||shopOpen||lvlUpOpen)return;
+  // Oyuncu hareketi
+  if(keys['ArrowLeft']||keys['KeyA']){P.vx-=1.2;if(P.vx<-SPEED)P.vx=-SPEED;}
+  else if(keys['ArrowRight']||keys['KeyD']){P.vx+=1.2;if(P.vx>SPEED)P.vx=SPEED;}
+  else{P.vx*=0.78;}
+  if((keys['ArrowUp']||keys['KeyW']||keys['Space'])&&P.onGround){P.vy=JUMP;P.onGround=false;}
+  P.vy+=GRAVITY;
+  P.x+=P.vx;P.y+=P.vy;
+  P.onGround=false;
+  // Platform çarpışma
+  platforms.forEach(function(pl){
+    if(P.x+P.w/2>pl.x&&P.x-P.w/2<pl.x+pl.w&&P.y>pl.y&&P.y<pl.y+pl.h+P.vy+1&&P.vy>0){
+      P.y=pl.y;P.vy=0;P.onGround=true;
+    }
+  });
+  // Sınır
+  if(P.x<80)P.x=80;
+  if(P.y>C.height+100){P.hp-=20;P.y=200;P.x=200;P.vy=0;}
+  // Kamera
+  CAM.x=P.x-C.width/3;if(CAM.x<0)CAM.x=0;
+  CAM.y=0;
+  // Cooldownlar
+  if(attackCooldown>0)attackCooldown--;
+  if(magicCooldown>0)magicCooldown--;
+  if(P.invincible>0)P.invincible--;
+  // Regen
+  regenTimer++;
+  if(regenTimer%60===0){
+    P.mp=Math.min(P.maxMp,P.mp+3);
+    if(P.skills.indexOf('s3')!==-1)P.hp=Math.min(P.maxHp,P.hp+1);
+  }
+  // Düşmanlar
+  enemies.forEach(function(e){
+    if(e.dead){if(e.deathTimer>0)e.deathTimer--;return;}
+    if(e.flash>0)e.flash--;
+    // Hareket
+    if(e.patrol){
+      e.x+=e.vx;
+      // Zemin
+      var onG=false;
+      platforms.forEach(function(pl){
+        if(e.x+e.w>pl.x&&e.x<pl.x+pl.w&&e.y>pl.y&&e.y<pl.y+pl.h+e.vy+1&&e.vy>=0){
+          e.y=pl.y;e.vy=0;onG=true;
+        }
+      });
+      if(!onG){e.vy+=GRAVITY*0.8;}
+      e.y+=e.vy;
+      // Sınır kontrol
+      if(e.x<e.startX-200||e.x>e.startX+200)e.vx*=-1;
+      if(e.x<0)e.vx=Math.abs(e.vx);
+    }
+    // Oyuncuya çarpma
+    if(P.invincible===0){
+      var ex=e.x+e.w/2;var ey=e.y-e.h/2;
+      var px=P.x;var py=P.y-P.h/2;
+      if(Math.abs(ex-px)<(e.w/2+P.w/2)&&Math.abs(ey-py)<(e.h/2+P.h/2)){
+        var dmg=Math.max(1,e.atk-(P.def+(P.equip.a?P.equip.a.def:0)));
+        P.hp-=dmg;P.invincible=40;
+        spawnFloatText('-'+dmg+'❤️',P.x,P.y-P.h-10,'#e74c3c');
+        P.vx+=(P.x>e.x?1:-1)*5;P.vy=-5;
+        if(P.hp<=0)playerDead();
+      }
+    }
+    // Mermi atma
+    if(e.shoot){
+      e.shootTimer--;
+      if(e.shootTimer<=0){
+        e.shootTimer=80+Math.random()*60;
+        var dx=P.x-(e.x+e.w/2);var dy=(P.y-P.h/2)-(e.y-e.h/2);
+        var len=Math.sqrt(dx*dx+dy*dy);
+        if(len>0&&len<400){
+          projectiles.push({x:e.x+e.w/2,y:e.y-e.h/2,vx:(dx/len)*5,vy:(dy/len)*5,life:80,dmg:Math.floor(e.atk*0.7),magic:false,emoji:'🔴',size:14,owner:'enemy'});
+        }
+      }
+    }
+  });
+  // Mermiler
+  projectiles.forEach(function(pr,i){
+    pr.x+=pr.vx;pr.y+=pr.vy;pr.life--;
+    if(pr.owner==='player'){
+      // Düşmana çarptı mı?
+      enemies.forEach(function(e){
+        if(e.dead)return;
+        if(pr.life>0&&Math.abs(pr.x-(e.x+e.w/2))<e.w/2+10&&Math.abs(pr.y-(e.y-e.h/2))<e.h/2+10){
+          var dmg=pr.dmg+(P.skills.indexOf('s1')!==-1?Math.floor(pr.dmg*0.8):0);
+          e.hp-=dmg;e.flash=8;
+          spawnFloatText(dmg,e.x+e.w/2,e.y-20,'#a29bfe',18);
+          particles.push({x:e.x+e.w/2,y:e.y-e.h/2,vx:0,vy:0,life:20,color:'#8e44ad',size:20,type:'explode'});
+          pr.life=0;
+          if(e.hp<=0)killEnemy(e);
+        }
+      });
+    } else {
+      // Oyuncuya çarptı mı?
+      if(P.invincible===0&&pr.life>0&&Math.abs(pr.x-P.x)<P.w/2+8&&Math.abs(pr.y-(P.y-P.h/2))<P.h/2+8){
+        var dmg2=Math.max(1,pr.dmg-(P.def+(P.equip.a?P.equip.a.def:0)));
+        P.hp-=dmg2;P.invincible=25;
+        spawnFloatText('-'+dmg2+'❤️',P.x,P.y-P.h-10,'#e74c3c');
+        pr.life=0;
+        if(P.hp<=0)playerDead();
+      }
+    }
+  });
+  // Ölü mermileri temizle
+  projectiles=projectiles.filter(function(pr){return pr.life>0;});
+  // Partiküller
+  particles.forEach(function(pa){
+    pa.x+=pa.vx;pa.y+=pa.vy;pa.vy+=0.2;pa.life--;
+  });
+  particles=particles.filter(function(pa){return pa.life>0;});
+  // Kolektifler
+  collectibles.forEach(function(col){
+    if(col.collected)return;
+    if(Math.abs(col.x-P.x)<30&&Math.abs(col.y-(P.y-P.h/2))<40){
+      col.collected=true;
+      if(col.type==='gold'){P.gold+=10+P.chapter;spawnFloatText('+💰'+(10+P.chapter),col.x,col.y-20,'#f1c40f');}
+      else{P.hp=Math.min(P.maxHp,P.hp+20);spawnFloatText('+20❤️',col.x,col.y-20,'#2ecc71');}
+    }
+  });
+  updateHUD();
+}
+
+function playerDead(){
+  dead=true;
+  P.ws=0;
+  if(P.skills.indexOf('s8')!==-1){
+    P.hp=1;dead=false;P.invincible=60;
+    P.skills=P.skills.filter(function(s){return s!=='s8';});
+    spawnFloatTxtPlayer('🌟 ÖLÜMSÜZLÜK!','#f1c40f');
+    return;
+  }
+  document.getElementById('go-msg').textContent='Bölüm '+P.chapter+' · Seviye '+P.level+' · '+P.kc+' düşman öldürdün';
+  document.getElementById('gameover').style.display='flex';
+}
+function respawn(){
+  dead=false;
+  document.getElementById('gameover').style.display='none';
+  P.hp=Math.floor(P.maxHp*0.6);P.mp=Math.floor(P.maxMp*0.5);
+  P.x=200;P.y=300;P.vx=0;P.vy=0;P.invincible=60;
+}
+
+// ── ÇİZİM ──
+function draw(){
+  ctx.clearRect(0,0,C.width,C.height);
+  drawBG();
+  ctx.save();
+  ctx.translate(-CAM.x,-CAM.y);
+  // Platformlar
+  platforms.forEach(function(p){
+    // translate zaten yapıldı, CAM hesabını kaldır
+    if(p.type==='ground'){
+      ctx.fillStyle='#0d0d1f';
+      ctx.fillRect(p.x,p.y,p.w,p.h);
+      ctx.strokeStyle='#2a2a4a';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+p.w,p.y);ctx.stroke();
+    } else {
+      var grd=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);
+      grd.addColorStop(0,p.color);grd.addColorStop(1,p.color+'44');
+      ctx.fillStyle=grd;ctx.strokeStyle=p.color+'88';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,p.h,4);ctx.fill();ctx.stroke();
+    }
+  });
+  // Kolektifler
+  collectibles.forEach(function(col){
+    if(col.collected)return;
+    ctx.font='20px serif';ctx.textAlign='center';
+    var bob=Math.sin(Date.now()*0.004)*4;
+    ctx.fillText(col.type==='gold'?'💰':'❤️',col.x,col.y+bob);
+  });
+  // Partiküller
+  particles.forEach(function(pa){
+    ctx.save();ctx.globalAlpha=pa.life/40;
+    if(pa.type==='slash'){
+      ctx.font=pa.size+'px serif';ctx.textAlign='center';ctx.fillText('⚡',pa.x,pa.y);
+    } else if(pa.type==='explode'){
+      ctx.font=pa.size+'px serif';ctx.textAlign='center';ctx.fillText('💥',pa.x,pa.y);
+    } else {
+      ctx.fillStyle=pa.color;
+      ctx.beginPath();ctx.arc(pa.x,pa.y,pa.size/2,0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  });
+  // Mermiler
+  projectiles.forEach(function(pr){
+    ctx.font=pr.size+'px serif';ctx.textAlign='center';
+    ctx.fillText(pr.emoji,pr.x,pr.y);
+  });
+  // Düşmanlar
+  enemies.forEach(function(e){drawEnemy(e);});
+  // Oyuncu
+  drawPlayer();
+  ctx.restore();
+  // Crosshair
+  if(!shopOpen&&!lvlUpOpen&&!dead){
+    ctx.save();
+    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(mouse.x,mouse.y,8,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(mouse.x-14,mouse.y);ctx.lineTo(mouse.x+14,mouse.y);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(mouse.x,mouse.y-14);ctx.lineTo(mouse.x,mouse.y+14);ctx.stroke();
+    ctx.restore();
+  }
+  // Bölüm bilgisi
+  ctx.fillStyle='rgba(255,255,255,0.06)';
+  ctx.font='bold 80px serif';ctx.textAlign='center';
+  ctx.fillText(P.chapter<=50?'🌲':P.chapter<=100?'🏔️':P.chapter<=150?'🌋':P.chapter<=200?'🌑':'🤖',C.width/2,C.height/2);
+}
+
+// ── OYUN DÖNGÜSÜ ──
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// ── BAŞLANGIÇ ──
+// Karakter seçim ekranı - canvas üzerinde
+function showCharSelect(){
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:300;';
+  overlay.innerHTML='<div style="background:#0a0a1a;border:2px solid #2a52cc;border-radius:20px;padding:32px;text-align:center;max-width:400px;width:90%;">'
+    +'<div style="font-size:48px;margin-bottom:8px;">⚔️</div>'
+    +'<div style="font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;">Robot Krallığı</div>'
+    +'<div style="font-size:13px;color:#aaa;margin-bottom:24px;">WASD: Hareket · Sol Tık: Saldır · Sağ Tık: Büyü · E: Mağaza</div>'
+    +'<div style="font-size:13px;color:#7a9aff;margin-bottom:16px;font-weight:600;">Karakterini seç:</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">'
+    +CHARS.map(function(c,i){return '<button onclick="selectChar('+i+')" style="background:#1a1a2e;border:2px solid '+c.color+'44;border-radius:12px;padding:14px;cursor:pointer;color:#fff;font-size:13px;font-weight:700;transition:all 0.2s;" onmouseover="this.style.borderColor=\''+c.color+'\'" onmouseout="this.style.borderColor=\''+c.color+'44\'">'+'<div style="font-size:36px;margin-bottom:4px;">'+c.emoji+'</div><div>'+c.name+'</div></button>';}).join('')
+    +'</div>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  window.selectChar=function(i){
+    P.char=i;
+    var base=CHARS[i];
+    if(i===0){P.maxMp=100;P.mp=100;P.maxHp=80;P.hp=80;P.atk=14;}
+    else if(i===1){P.maxMp=30;P.mp=30;P.maxHp=120;P.hp=120;P.atk=20;P.def=6;}
+    else if(i===2){P.maxMp=60;P.mp=60;P.maxHp=100;P.hp=100;P.atk=16;}
+    else{P.maxMp=20;P.mp=20;P.maxHp=140;P.hp=140;P.def=14;}
+    document.body.removeChild(overlay);
+    genLevel(P.chapter);
+    updateHUD();
+    loop();
+  };
+}
+
+// roundRect polyfill
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    this.beginPath();this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.arcTo(x+w,y,x+w,y+r,r);this.lineTo(x+w,y+h-r);this.arcTo(x+w,y+h,x+w-r,y+h,r);this.lineTo(x+r,y+h);this.arcTo(x,y+h,x,y+h-r,r);this.lineTo(x,y+r);this.arcTo(x,y,x+r,y,r);this.closePath();
+  };
+}
+
+showCharSelect();
 </script>
 </body>
 </html>
